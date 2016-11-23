@@ -1,6 +1,7 @@
 # RxRapidApi
 RxAndroid + RapidApi with a sprinkle of Retrofit style flavoring.
 
+To save embedding the application and API key in every service interface, I like to pull them out into the build config:
 ```java
     defaultConfig {
         .
@@ -10,6 +11,8 @@ RxAndroid + RapidApi with a sprinkle of Retrofit style flavoring.
         buildConfigField "String", "API_KEY", "\"<your api key>\""
     }
 ```
+## Example Service
+Calling a service is as easy as defining a Java interface with a few annotations:
 
 ```java
 @Application(project = BuildConfig.PROJECT, key = BuildConfig.API_KEY)
@@ -25,6 +28,7 @@ public interface SpotifyApi {
 
 }
 ```
+Then later you make the service call.  Multiple services can be combined, responses transformed and all the other wonderful Rx goodness!
 
 ```java
 RxRapidApiBuilder.from(SpotifyApi.class).searchAlbums("panic at the disco", "", "", "")
