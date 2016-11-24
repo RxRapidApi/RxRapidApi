@@ -1,5 +1,5 @@
 # RxRapidApi
-RxAndroid + RapidApi with a sprinkle of Retrofit style flavoring.
+RapidApi with a sprinkle of RxAndroid + Retrofit style flavoring.
 
 To save embedding the application and API key in every service interface, I like to pull them out into the build config:
 ```java
