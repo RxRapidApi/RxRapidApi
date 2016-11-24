@@ -29,7 +29,7 @@ SpotifyApi serviceApi = RxRapidApiBuilder.from(SpotifyApi.class);
 // Make the service call
 Observable<Map<String, Object>> observable = serviceApi.searchAlbums("panic at the disco", "", "", "");
 ```
-Remeber, you will want to subscribe to execute the call and run it on a background thread if you're on Android, but this is all standard Rx.
+Remember, you will want to subscribe to execute the call and run it on a background thread if you're on Android, but this is all standard Rx.
 
 ```java
 observable
@@ -61,7 +61,7 @@ observable
 
 ## Configuration
 ### Use ```BuildConfig```
-To save embedding the application and API key in every service interface, I like to pull them out into the build config:
+While its not an absolute requirement, I like to pull configuration details like the API key and project into my ```build.gradle``` so that they are easy to change for different build variants, and it gets rid of hard-coded strings in the interfaces.
 ```java
     defaultConfig {
         .
