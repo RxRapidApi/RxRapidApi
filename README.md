@@ -60,7 +60,7 @@ RxRapidApiBuilder.from(SpotifyApi.class).searchAlbums("panic at the disco", "", 
 
 ## Configuration
 
-### ````@Application``` annotation
+### ```@Application``` annotation
 
 This annotation is required either at the class level (on the ```interface``` declaration) or on a method.  Note: if the annotation is present in both locations, the method level annotation will take precedence.  The method level annotation means you can mix & match applications and api keys in the same interface (although that is not recommended).
 
