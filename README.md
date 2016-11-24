@@ -1,16 +1,6 @@
 # RxRapidApi
 [RapidApi](https://www.rapidapi.com/) with a sprinkle of [RxAndroid](https://github.com/ReactiveX/RxAndroid) with just a touch of [Retrofit](https://github.com/square/retrofit) inspired syntax.
 
-To save embedding the application and API key in every service interface, I like to pull them out into the build config:
-```java
-    defaultConfig {
-        .
-        .
-        .
-        buildConfigField "String", "PROJECT", "\"<your project name>\""
-        buildConfigField "String", "API_KEY", "\"<your api key>\""
-    }
-```
 ## Example Service
 Calling a service is as easy as defining a Java interface with a few annotations:
 
@@ -70,7 +60,17 @@ observable
 ```
 
 ## Configuration
-
+### Use ```BuildConfig```
+To save embedding the application and API key in every service interface, I like to pull them out into the build config:
+```java
+    defaultConfig {
+        .
+        .
+        .
+        buildConfigField "String", "PROJECT", "\"<your project name>\""
+        buildConfigField "String", "API_KEY", "\"<your api key>\""
+    }
+```
 ### ```@Application``` annotation
 
 This annotation is required either at the class level (on the ```interface``` declaration) or on a method.  Note: if the annotation is present in both locations, the method level annotation will take precedence.  The method level annotation means you can mix & match applications and api keys in the same interface (although that is not recommended).
