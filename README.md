@@ -1,5 +1,5 @@
 # RxRapidApi
-RapidApi with a sprinkle of RxAndroid + Retrofit style flavoring.
+[RapidApi](https://www.rapidapi.com/) with a sprinkle of [RxAndroid](https://github.com/ReactiveX/RxAndroid) with just a touch of [Retrofit](https://github.com/square/retrofit) inspired syntax.
 
 To save embedding the application and API key in every service interface, I like to pull them out into the build config:
 ```java
@@ -128,16 +128,16 @@ Each parameter needs an ```@Named``` annotation.  They can be specified in any o
 
 
 # License
->    Copyright 2016 Paul S Hawke
->
->   Licensed under the Apache License, Version 2.0 (the "License");
->   you may not use this file except in compliance with the License.
->   You may obtain a copy of the License at
->
->       http://www.apache.org/licenses/LICENSE-2.0
->
->   Unless required by applicable law or agreed to in writing, software
->   distributed under the License is distributed on an "AS IS" BASIS,
->   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
->   See the License for the specific language governing permissions and
->   limitations under the License.
+    Copyright 2016 Paul S Hawke
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
