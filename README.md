@@ -28,13 +28,18 @@ public interface SpotifyApi {
 
 }
 ```
-Then later you make the service call.  Multiple services can be combined, responses transformed and all the other wonderful Rx goodness!
+Then later you call the service as if its just a local method.  Multiple services can be combined, responses transformed and all the other wonderful Rx goodness!
 
 ```java
-RxRapidApiBuilder.from(SpotifyApi.class).searchAlbums("panic at the disco", "", "", "")
-        .subscribeOn(Schedulers.newThread())
-        .observeOn(AndroidSchedulers.mainThread())
-        .subscribe(new Subscriber<Map<String, Object>>() {
+Observable<Map<String, Object>> observable = RxRapidApiBuilder.from(SpotifyApi.class).searchAlbums("panic at the disco", "", "", "");
+```
+Remeber, you will want to subscribe to execute the call and run it on a background thread if you're on Android, but this is all standard Rx.
+
+```java
+observable
+    .subscribeOn(Schedulers.newThread())
+    .observeOn(AndroidSchedulers.mainThread())
+    .subscribe(new Subscriber<Map<String, Object>>() {
             @Override
             public void onCompleted() {
             }
