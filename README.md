@@ -29,7 +29,7 @@ SpotifyApi serviceApi = RxRapidApiBuilder.from(SpotifyApi.class);
 // Make the service call
 Observable<Map<String, Object>> observable = serviceApi.searchAlbums("panic at the disco", "", "", "");
 ```
-Remember, you will want to subscribe to execute the call and run it on a background thread if you're on Android, but this is all standard Rx.
+Remember, you will want to subscribe in order to actually execute the call (and run it on a background thread if you're on Android) but this is all standard Rx.
 
 ```java
 observable
