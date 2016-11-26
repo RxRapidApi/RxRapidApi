@@ -1,12 +1,11 @@
 package com.gatebuzz.rapidapi.rx;
 
-import android.util.Log;
+import android.support.annotation.NonNull;
 
-import com.rapidapi.rapidconnect.Argument;
-import com.rapidapi.rapidconnect.RapidApiConnect;
+import com.gatebuzz.rapidapi.rx.internal.CallConfiguration;
+import com.gatebuzz.rapidapi.rx.internal.InvocationHandler;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
@@ -14,110 +13,79 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import rx.Observable;
-import rx.Subscriber;
-
-public class RxRapidApiBuilder {
-
-    private final String key;
-    private final String project;
-    private final List<String> parameters;
-    private final String pack;
-    private final String block;
-
-    public RxRapidApiBuilder(String key, String project, List<String> parameters, String pack, String block) {
-        this.key = key;
-        this.project = project;
-        this.parameters = parameters;
-        this.pack = pack;
-        this.block = block;
-    }
+public abstract class RxRapidApiBuilder {
 
     @SuppressWarnings("unchecked")
     public static <I> I from(Class<I> interfaceClass) {
-        Map<String, RxRapidApiBuilder> builders = new HashMap<>();
         Application applicationAnnotation = interfaceClass.getAnnotation(Application.class);
-        String appProject = applicationAnnotation != null ? applicationAnnotation.project() : null;
-        String appKey = applicationAnnotation != null ? applicationAnnotation.key() : null;
+        String project = applicationAnnotation != null ? applicationAnnotation.project() : null;
+        String key = applicationAnnotation != null ? applicationAnnotation.key() : null;
+
+        Map<String, CallConfiguration> callConfigurationMap = new HashMap<>();
         for (Method method : interfaceClass.getMethods()) {
-            ApiPackage packageAnnotation = method.getAnnotation(ApiPackage.class);
-            Application methodAppAnnotation = method.getAnnotation(Application.class);
-            String project = appProject;
-            String key = appKey;
-            if (methodAppAnnotation != null) {
-                project = methodAppAnnotation.project();
-                key = methodAppAnnotation.key();
-            }
-            Named methodNameAnnotation = method.getAnnotation(Named.class);
-            String name = method.getName();
-            if (methodAppAnnotation != null) {
-                name = methodNameAnnotation.value();
-            }
-            List<String> parameters = new ArrayList<>();
-            Annotation[][] parameterAnnotations = method.getParameterAnnotations();
-            for (int i = 0; i < parameterAnnotations.length; i++) {
-                Annotation[] annotations = parameterAnnotations[i];
-                for (Annotation annotation : annotations) {
-                    if (annotation.annotationType().equals(Named.class)) {
-                        parameters.add(((Named)annotation).value());
-                    }
-                }
-            }
-
-            builders.put(method.getName(), new RxRapidApiBuilder(key, project, parameters, packageAnnotation.value(), name));
+            callConfigurationMap.put(method.getName(), configureCall(project, key, method));
         }
+
         return (I) Proxy.newProxyInstance(interfaceClass.getClassLoader(),
-                new Class[]{interfaceClass}, new RapidApiConnectInvocationHandler(builders));
+                new Class[]{interfaceClass}, new InvocationHandler(callConfigurationMap));
     }
 
-    private static class RapidApiConnectInvocationHandler implements InvocationHandler {
-        private Map<String, RxRapidApiBuilder> builders;
-
-        RapidApiConnectInvocationHandler(Map<String, RxRapidApiBuilder> builders) {
-            this.builders = builders;
+    @NonNull
+    private static CallConfiguration configureCall(String project, String key, Method method) {
+        Application methodAppAnnotation = method.getAnnotation(Application.class);
+        if (methodAppAnnotation != null) {
+            project = methodAppAnnotation.project();
+            key = methodAppAnnotation.key();
         }
 
-        @Override
-        public Object invoke(Object o, Method method, Object[] objects) throws Throwable {
-            final RxRapidApiBuilder builder = builders.get(method.getName());
-
-            final Map<String, Argument> body = new HashMap<>();
-            for (int i = 0; i < builder.parameters.size(); i++) {
-                body.put(builder.parameters.get(i), new Argument("data", String.valueOf(objects[i])));
-            }
-
-            return Observable.create(new Engine(builder, body));
+        if (project == null || project.trim().isEmpty()) {
+            throw new IllegalArgumentException("Project name not found (check the @Application annotation).");
         }
+
+        if (key == null || key.trim().isEmpty()) {
+            throw new IllegalArgumentException("API key not found (check the @Application annotation).");
+        }
+
+        String name = collectRemoteMethodName(method);
+        if (name.trim().isEmpty()) {
+            throw new IllegalArgumentException("API method name not found on " + method.getName() + "() " +
+                    "(check the @Named annotation on your interface method).");
+        }
+
+        List<String> parameters = collectParameterNames(method);
+        if (parameters.size() != method.getParameterTypes().length) {
+            throw new IllegalArgumentException("Incorrect number of @Named parameters on " +
+                    method.getName() + "() - expecting " + method.getParameterTypes().length +
+                    ", found " + parameters.size() + ".");
+        }
+
+        ApiPackage packageAnnotation = method.getAnnotation(ApiPackage.class);
+        String pack = packageAnnotation != null ? packageAnnotation.value() : null;
+        if (pack == null || pack.trim().isEmpty()) {
+            throw new IllegalArgumentException("API package not found on " + method.getName() + "() " +
+                    "(check the @ApiPackage annotation).");
+        }
+
+        return new CallConfiguration(project, key, pack, name, parameters);
     }
 
-    @SuppressWarnings("unchecked")
-    private static class Engine implements Observable.OnSubscribe<Map<String, Object>> {
-        private final RxRapidApiBuilder builder;
-        private final Map<String, Argument> body;
+    @NonNull
+    private static String collectRemoteMethodName(Method method) {
+        Named methodNameAnnotation = method.getAnnotation(Named.class);
+        return (methodNameAnnotation != null) ? methodNameAnnotation.value() : method.getName();
+    }
 
-        private Engine(RxRapidApiBuilder builder, Map<String, Argument> body) {
-            this.builder = builder;
-            this.body = body;
-        }
-
-        @Override
-        public void call(Subscriber<? super Map<String, Object>> subscriber) {
-            RapidApiConnect rapidApiConnect = new RapidApiConnect(builder.project, builder.key);
-            Map<String, Object> response;
-            try {
-                Log.e("Example", "Project = "+builder.project+", Key = "+builder.key);
-                Log.e("Example", "Pack = "+builder.pack+", Block = "+builder.block);
-                Log.e("Example", "Body = "+body);
-                response = (Map<String, Object>) rapidApiConnect.call(builder.pack, builder.block, body);
-                if (response.get("success") != null) {
-                    subscriber.onNext(response);
-                } else {
-                    subscriber.onError(new FailedCallException(response));
+    @NonNull
+    private static List<String> collectParameterNames(Method method) {
+        List<String> parameters = new ArrayList<>();
+        Annotation[][] parameterAnnotations = method.getParameterAnnotations();
+        for (Annotation[] annotations : parameterAnnotations) {
+            for (Annotation annotation : annotations) {
+                if (annotation.annotationType().equals(Named.class)) {
+                    parameters.add(((Named) annotation).value());
                 }
-            } catch (Exception e) {
-                subscriber.onError(e);
             }
         }
+        return parameters;
     }
-
 }
