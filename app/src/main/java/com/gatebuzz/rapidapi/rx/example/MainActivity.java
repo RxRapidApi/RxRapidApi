@@ -8,7 +8,6 @@ import android.util.Log;
 import android.view.View;
 
 import com.gatebuzz.rapidapi.rx.FailedCallException;
-import com.gatebuzz.rapidapi.rx.R;
 import com.gatebuzz.rapidapi.rx.RxRapidApiBuilder;
 
 import java.util.Map;

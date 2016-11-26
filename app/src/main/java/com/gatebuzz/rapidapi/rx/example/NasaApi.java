@@ -2,7 +2,6 @@ package com.gatebuzz.rapidapi.rx.example;
 
 import com.gatebuzz.rapidapi.rx.ApiPackage;
 import com.gatebuzz.rapidapi.rx.Application;
-import com.gatebuzz.rapidapi.rx.BuildConfig;
 import com.gatebuzz.rapidapi.rx.Named;
 
 import java.util.Map;

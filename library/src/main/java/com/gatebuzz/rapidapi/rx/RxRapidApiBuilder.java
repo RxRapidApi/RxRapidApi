@@ -1,5 +1,6 @@
 package com.gatebuzz.rapidapi.rx;
 
+import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
 
 import com.gatebuzz.rapidapi.rx.internal.CallConfiguration;
@@ -13,6 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Keep
 public abstract class RxRapidApiBuilder {
 
     @SuppressWarnings("unchecked")
