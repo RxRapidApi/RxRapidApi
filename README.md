@@ -1,6 +1,13 @@
 # RxRapidApi
 [RapidApi](https://www.rapidapi.com/) with a sprinkle of [RxAndroid](https://github.com/ReactiveX/RxAndroid) with just a touch of [Retrofit](https://github.com/square/retrofit) inspired syntax.
 
+## Download
+
+Files are on **jcenter**, available via Gradle:
+```
+compile(group: 'com.gatebuzz', name: 'rxrapidapi', version: '0.1', ext: 'aar', classifier: '')
+```
+
 ## Example Service
 Calling a service is as easy as defining a Java interface with a few annotations:
 
@@ -126,13 +133,6 @@ public interface SpotifyApi {
 The method parameter names are there for convenience and have no bearing on the parameters that are passed through to RapidApi.
 Each parameter needs an ```@Named``` annotation.  They can be specified in any order in the interface.  Optionally parameters
 can be marked ```@UrlEncoded``` if the service you are trying to call requires data in this format.
-
-# Download
-
-Files are on **jcenter**, available via Gradle:
-```
-compile(group: 'com.gatebuzz', name: 'rxrapidapi', version: '0.1', ext: 'aar', classifier: '')
-```
 
 # License
     Copyright 2016 Paul S Hawke
