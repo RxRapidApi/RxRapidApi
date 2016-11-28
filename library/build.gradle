@@ -61,7 +61,9 @@ dependencies {
 }
 
 Properties properties = new Properties()
-properties.load(project.rootProject.file('local.properties').newDataInputStream())
+if (project.rootProject.file('local.properties').exists()) {
+    properties.load(project.rootProject.file('local.properties').newDataInputStream())
+}
 def bintrayUser = properties.getProperty('bintray.user.name')
 def bintrayApiKey = properties.getProperty('bintray.api.key')
 

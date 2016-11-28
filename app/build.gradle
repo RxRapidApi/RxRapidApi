@@ -1,7 +1,9 @@
 apply plugin: 'com.android.application'
 
 Properties properties = new Properties()
-properties.load(project.rootProject.file('local.properties').newDataInputStream())
+if (project.rootProject.file('local.properties').exists()) {
+    properties.load(project.rootProject.file('local.properties').newDataInputStream())
+}
 def rapidApiProject = properties.getProperty('rapidapi.project.name')
 def rapidApiKey = properties.getProperty('rapidapi.api.key')
 def zillowApiKey = properties.getProperty('zillow.api.key')
