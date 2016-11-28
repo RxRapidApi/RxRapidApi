@@ -124,8 +124,15 @@ public interface SpotifyApi {
 ### Method parameters
 
 The method parameter names are there for convenience and have no bearing on the parameters that are passed through to RapidApi.
-Each parameter needs an ```@Named``` annotation.  They can be specified in any order in the interface.
+Each parameter needs an ```@Named``` annotation.  They can be specified in any order in the interface.  Optionally parameters
+can be marked ```@UrlEncoded``` if the service you are trying to call requires data in this format.
 
+# Download
+
+Files are on **jcenter**, available via Gradle:
+```
+compile(group: 'com.gatebuzz', name: 'rxrapidapi', version: '0.1', ext: 'aar', classifier: '')
+```
 
 # License
     Copyright 2016 Paul S Hawke

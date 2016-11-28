@@ -11,6 +11,7 @@ buildscript {
 
 apply plugin: 'com.android.library'
 apply plugin: 'me.tatarka.retrolambda'
+apply plugin: "maven-publish"
 apply plugin: 'com.jfrog.bintray'
 
 android {
@@ -33,10 +34,6 @@ android {
     }
     buildTypes {
         debug {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
-        candidate {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
@@ -68,23 +65,23 @@ properties.load(project.rootProject.file('local.properties').newDataInputStream(
 def bintrayUser = properties.getProperty('bintray.user.name')
 def bintrayApiKey = properties.getProperty('bintray.api.key')
 
-//publishing {
-//    publications {
-//        MyPublication(MavenPublication) {
-//            from components.java
-//            groupId 'com.gatebuzz'
-//            artifactId 'rxrapidapi'
-//            version '0.1'
-//        }
-//    }
-//}
+publishing {
+    publications {
+        MyPublication(MavenPublication) {
+            artifact("$buildDir/outputs/aar/library-release.aar")
+            groupId 'com.gatebuzz'
+            artifactId 'rxrapidapi'
+            version '0.1'
+        }
+    }
+}
 
 bintray {
     user = bintrayUser
     key = bintrayApiKey
-    // publications = ['MyPublication']
+    publications = ['MyPublication']
     pkg {
-        repo = 'maven'
+        repo = 'RxRapidApi'
         name = 'RxRapidApi'
         userOrg = 'rxrapidapi'
         licenses = ['Apache-2.0']
