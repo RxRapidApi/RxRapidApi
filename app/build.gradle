@@ -22,6 +22,11 @@ android {
         buildConfigField "String", "API_KEY", "\"${rapidApiKey}\""
         buildConfigField "String", "ZILLOW_API_KEY", "\"${zillowApiKey}\""
     }
+
+    lintOptions {
+        abortOnError false
+    }
+
     buildTypes {
         release {
             minifyEnabled false
