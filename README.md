@@ -1,5 +1,7 @@
 # RxRapidApi
-[RapidApi](https://www.rapidapi.com/) with a sprinkle of [RxAndroid](https://github.com/ReactiveX/RxAndroid) with just a touch of [Retrofit](https://github.com/square/retrofit) inspired syntax.
+[![Build Status](https://travis-ci.org/psh/RxRapidApi.svg?branch=master)](https://travis-ci.org/psh/RxRapidApi) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) 
+
+[RapidApi](https://www.rapidapi.com/) with a sprinkle of [RxAndroid](https://github.com/ReactiveX/RxAndroid) and just a touch of [Retrofit](https://github.com/square/retrofit) inspired syntax.
 
 ## Download
 
