@@ -132,7 +132,22 @@ public interface SpotifyApi {
 
 The method parameter names are there for convenience and have no bearing on the parameters that are passed through to RapidApi.
 Each parameter needs an ```@Named``` annotation.  They can be specified in any order in the interface.  Optionally parameters
-can be marked ```@UrlEncoded``` if the service you are trying to call requires data in this format.
+can be marked ```@UrlEncoded``` if the service you are trying to call requires data in this format.  For example
+
+```java
+@Application(project = BuildConfig.PROJECT, key = BuildConfig.API_KEY)
+public interface ZillowApi {
+
+    @ApiPackage("Zillow")
+    Observable<Map<String, Object>> getSearchResults(
+            @Named("rentzestimate") String rentEstimate,
+            @Named("zwsId") String zillowWebServiceId,
+            @Named("address") @UrlEncoded String address,
+            @Named("citystatezip") String cityStateZip
+    );
+
+}
+```
 
 # License
     Copyright 2016 Paul S Hawke
