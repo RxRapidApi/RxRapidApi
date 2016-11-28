@@ -1,9 +1,10 @@
 package com.gatebuzz.rapidapi.rx.internal;
 
+import android.support.v4.util.Pair;
+
 import com.gatebuzz.rapidapi.rx.ApiPackage;
 import com.gatebuzz.rapidapi.rx.Application;
 import com.gatebuzz.rapidapi.rx.Named;
-import com.rapidapi.rapidconnect.Argument;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -33,11 +34,11 @@ public class InvocationHandlerTest {
     @Mock
     private InvocationHandler.EngineYard engineYard;
     @Captor
-    private ArgumentCaptor<Map<String, Argument>> args;
+    private ArgumentCaptor<Map<String, Pair<String, String>>> args;
 
     @Test
     public void engineConfiguredAsExpected() throws Throwable {
-        CallConfiguration configuration = new CallConfiguration("a", "b", "c", "someMethod", Arrays.asList("first", "second"));
+        CallConfiguration configuration = new CallConfiguration("a", "b", "c", "someMethod", Arrays.asList("first", "second"), urlEncoded);
         String expectedFirstParam = "d";
         String expectedSecondParam = "e";
 
@@ -45,13 +46,14 @@ public class InvocationHandlerTest {
         Map<String, CallConfiguration> config = new HashMap<>();
         config.put("someMethod", configuration);
         InvocationHandler handler = new InvocationHandler(config, engineYard);
-        handler.invoke(null, SomeInterface.class.getMethod("someMethod", String.class, String.class), new Object[]{expectedFirstParam, expectedSecondParam});
+        handler.invoke(null, SomeInterface.class.getMethod("someMethod", String.class, String.class),
+                new Object[]{expectedFirstParam, expectedSecondParam});
 
         verify(engineYard).create(same(configuration), args.capture());
-        assertEquals("data", args.getValue().get("first").getType());
-        assertEquals(expectedFirstParam, args.getValue().get("first").getValue());
-        assertEquals("data", args.getValue().get("second").getType());
-        assertEquals(expectedSecondParam, args.getValue().get("second").getValue());
+        assertEquals("data", args.getValue().get("first").first);
+        assertEquals(expectedFirstParam, args.getValue().get("first").second);
+        assertEquals("data", args.getValue().get("second").first);
+        assertEquals(expectedSecondParam, args.getValue().get("second").second);
     }
 
     @Application(project = "a", key = "b")

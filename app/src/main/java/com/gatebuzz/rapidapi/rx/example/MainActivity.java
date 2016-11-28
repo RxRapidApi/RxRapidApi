@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void tryTheApi() {
-        RxRapidApiBuilder.from(SpotifyApi.class).searchAlbums("panic at the disco", "", "", "")
+        RxRapidApiBuilder.from(ZillowApi.class).getSearchResults("", BuildConfig.ZILLOW_API_KEY, "2039 yale avenue", "63143")
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<Map<String, Object>>() {
@@ -55,9 +55,8 @@ public class MainActivity extends AppCompatActivity {
 
                     @Override
                     public void onNext(Map<String, Object> response) {
-                        Log.e("Example", "Call success: " + response);
-                        Object success = response.get("success");
-                        Log.e("Example", "Success Key Type = " + success.getClass().getSimpleName());
+                        Log.e("Example", "Call success: " + response.get("success"));
+                        Log.e("Example", "type: " + response.get("success").getClass().getSimpleName());
                     }
                 });
     }

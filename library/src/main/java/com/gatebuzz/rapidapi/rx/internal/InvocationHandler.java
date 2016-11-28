@@ -1,10 +1,10 @@
 package com.gatebuzz.rapidapi.rx.internal;
 
 import android.support.annotation.VisibleForTesting;
-
-import com.rapidapi.rapidconnect.Argument;
+import android.support.v4.util.Pair;
 
 import java.lang.reflect.Method;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,21 +28,25 @@ public class InvocationHandler implements java.lang.reflect.InvocationHandler {
     public Object invoke(Object o, Method method, Object[] parameterValues) throws Throwable {
         final CallConfiguration configuration = callConfigurationMap.get(method.getName());
 
-        final Map<String, Argument> body = new HashMap<>();
+        final Map<String, Pair<String, String>> body = new HashMap<>();
         for (int i = 0; i < configuration.parameters.size(); i++) {
-            body.put(configuration.parameters.get(i), new Argument("data", String.valueOf(parameterValues[i])));
+            String value = String.valueOf(parameterValues[i]);
+            if (configuration.urlEncoded.contains(configuration.parameters.get(i))) {
+                value = URLEncoder.encode(value, "UTF-8");
+            }
+            body.put(configuration.parameters.get(i), new Pair<>("data", value));
         }
 
         return Observable.create(engineYard.create(configuration, body));
     }
 
     interface EngineYard {
-        Engine create(CallConfiguration configuration, Map<String, Argument> body);
+        Engine create(CallConfiguration configuration, Map<String, Pair<String, String>> body);
     }
 
     private static class DefaultEngineYard implements EngineYard {
         @Override
-        public Engine create(CallConfiguration configuration, Map<String, Argument> body) {
+        public Engine create(CallConfiguration configuration, Map<String, Pair<String, String>> body) {
             return new Engine(configuration, body);
         }
     }

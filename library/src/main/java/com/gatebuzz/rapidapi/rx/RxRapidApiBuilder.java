@@ -11,8 +11,10 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Keep
 public abstract class RxRapidApiBuilder {
@@ -68,7 +70,8 @@ public abstract class RxRapidApiBuilder {
                     "(check the @ApiPackage annotation).");
         }
 
-        return new CallConfiguration(project, key, pack, name, parameters);
+        Set<String> urlEncodedParameters = collectUrlEncodedParameters(method, parameters);
+        return new CallConfiguration(project, key, pack, name, parameters, urlEncodedParameters);
     }
 
     @NonNull
@@ -79,12 +82,27 @@ public abstract class RxRapidApiBuilder {
 
     @NonNull
     private static List<String> collectParameterNames(Method method) {
-        List<String> parameters = new ArrayList<>();
         Annotation[][] parameterAnnotations = method.getParameterAnnotations();
+        List<String> parameters = new ArrayList<>();
         for (Annotation[] annotations : parameterAnnotations) {
             for (Annotation annotation : annotations) {
                 if (annotation.annotationType().equals(Named.class)) {
                     parameters.add(((Named) annotation).value());
+                }
+            }
+        }
+        return parameters;
+    }
+
+    @NonNull
+    private static Set<String> collectUrlEncodedParameters(Method method, List<String> names) {
+        Set<String> parameters = new HashSet<>();
+        Annotation[][] parameterAnnotations = method.getParameterAnnotations();
+        for (int i = 0; i < parameterAnnotations.length; i++) {
+            Annotation[] annotations = parameterAnnotations[i];
+            for (Annotation annotation : annotations) {
+                if (annotation.annotationType().equals(UrlEncoded.class)) {
+                    parameters.add(names.get(i));
                 }
             }
         }

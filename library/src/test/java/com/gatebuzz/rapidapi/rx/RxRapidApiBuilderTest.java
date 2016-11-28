@@ -1,6 +1,5 @@
 package com.gatebuzz.rapidapi.rx;
 
-import com.gatebuzz.rapidapi.rx.internal.EngineTest;
 import com.gatebuzz.rapidapi.rx.internal.InvocationHandlerTest;
 
 import org.junit.runner.RunWith;
@@ -12,8 +11,7 @@ import org.junit.runners.Suite;
         ApiPackageNaming.class,
         MethodNaming.class,
         MethodParameterNaming.class,
-        InvocationHandlerTest.class,
-        EngineTest.class
+        InvocationHandlerTest.class
 })
 public class RxRapidApiBuilderTest {
 }

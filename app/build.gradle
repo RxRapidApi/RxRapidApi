@@ -1,5 +1,11 @@
 apply plugin: 'com.android.application'
 
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
+def rapidApiProject = properties.getProperty('rapidapi.project.name')
+def rapidApiKey = properties.getProperty('rapidapi.api.key')
+def zillowApiKey = properties.getProperty('zillow.api.key')
+
 android {
     compileSdkVersion 24
     buildToolsVersion "24.0.3"
@@ -10,8 +16,9 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-        buildConfigField "String", "PROJECT", "\"Android_SDK_Tinkering\""
-        buildConfigField "String", "API_KEY", "\"dfe786d7-0ef1-4b38-bf58-abf55667c5c6\""
+        buildConfigField "String", "PROJECT", "\"${rapidApiProject}\""
+        buildConfigField "String", "API_KEY", "\"${rapidApiKey}\""
+        buildConfigField "String", "ZILLOW_API_KEY", "\"${zillowApiKey}\""
     }
     buildTypes {
         release {

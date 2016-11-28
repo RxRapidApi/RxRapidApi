@@ -1,58 +1,102 @@
 package com.gatebuzz.rapidapi.rx.internal;
 
+import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
+import android.support.v4.util.Pair;
 
 import com.gatebuzz.rapidapi.rx.FailedCallException;
-import com.rapidapi.rapidconnect.Argument;
-import com.rapidapi.rapidconnect.RapidApiConnect;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
+import okhttp3.Credentials;
+import okhttp3.MultipartBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 import rx.Observable;
 import rx.Subscriber;
 
 @SuppressWarnings("unchecked")
 class Engine implements Observable.OnSubscribe<Map<String, Object>> {
+    private static final String URL_FORMAT = "https://rapidapi.io/connect/%1$s/%2$s";
+    private final OkHttpClient client;
     private final CallConfiguration callConfiguration;
-    private final Map<String, Argument> body;
-    private final ConnectFactory factory;
+    private final Map<String, Pair<String, String>> body;
+    private final Gson gson;
 
-    Engine(CallConfiguration callConfiguration, Map<String, Argument> body) {
-        this(callConfiguration, body, new DefaultConnectFactory());
+    Engine(CallConfiguration callConfiguration, Map<String, Pair<String, String>> body) {
+        this(callConfiguration, body, new OkHttpClient());
     }
 
     @VisibleForTesting
-    Engine(CallConfiguration callConfiguration, Map<String, Argument> body, ConnectFactory factory) {
+    Engine(CallConfiguration callConfiguration, Map<String, Pair<String, String>> body, OkHttpClient client) {
         this.callConfiguration = callConfiguration;
         this.body = body;
-        this.factory = factory;
+        this.client = client;
+        this.gson = new Gson();
     }
 
     @Override
     public void call(Subscriber<? super Map<String, Object>> subscriber) {
-        RapidApiConnect rapidApiConnect = factory.create(callConfiguration.project, callConfiguration.key);
-        Map<String, Object> response;
         try {
-            response = (Map<String, Object>) rapidApiConnect.call(callConfiguration.pack, callConfiguration.block, body);
-            if (response.get("success") != null) {
-                subscriber.onNext(response);
-                subscriber.onCompleted();
+            MultipartBody requestBody = createMultipartBody();
+
+            Request request = new Request.Builder()
+                    .url(String.format(URL_FORMAT, callConfiguration.pack, callConfiguration.block))
+                    .addHeader("User-Agent", "RapidAPIConnect_Java")
+                    .addHeader("Authorization", Credentials.basic(callConfiguration.project, callConfiguration.key))
+                    .post(requestBody)
+                    .build();
+
+            Response response = this.client.newCall(request).execute();
+            Map<String, Object> map = fromJson(response.body().string());
+
+            Map<String, Object> result = new HashMap<>();
+            if (response.code() != 200 || "error".equals(map.get("outcome"))) {
+                result.put("error", map.get("payload"));
+                subscriber.onError(new FailedCallException(result));
             } else {
-                subscriber.onError(new FailedCallException(response));
+                result.put("success", map.get("payload"));
+                subscriber.onNext(result);
+                subscriber.onCompleted();
             }
         } catch (Exception e) {
             subscriber.onError(e);
         }
     }
 
-    interface ConnectFactory {
-        RapidApiConnect create(String project, String key);
+    private Map<String, Object> fromJson(String string) {
+        return gson.fromJson(string, new TypeToken<Map<String, Object>>() {
+        }.getType());
     }
 
-    private static class DefaultConnectFactory implements ConnectFactory {
-        @Override
-        public RapidApiConnect create(String project, String key) {
-            return new RapidApiConnect(project, key);
+    @NonNull
+    private MultipartBody createMultipartBody() throws FileNotFoundException {
+        MultipartBody.Builder builder = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM);
+
+        Set<Map.Entry<String, Pair<String, String>>> entrySet = ((Map) body).entrySet();
+        for (Map.Entry<String, Pair<String, String>> entry : entrySet) {
+            Pair<String, String> argument = entry.getValue();
+            if ("data".equals(argument.first)) {
+                builder.addFormDataPart(entry.getKey(), argument.second);
+            } else {
+                File file = new File(argument.second);
+                if (file.exists() && file.isFile()) {
+                    builder.addFormDataPart(entry.getKey(), file.getName(), RequestBody.create(MultipartBody.FORM, file));
+                } else {
+                    throw new FileNotFoundException(argument.second);
+                }
+            }
         }
+        return builder.build();
     }
+
 }

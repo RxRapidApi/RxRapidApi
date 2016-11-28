@@ -1,8 +1,26 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+
+    dependencies {
+        classpath 'me.tatarka:gradle-retrolambda:3.3.0'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7'
+    }
+}
+
 apply plugin: 'com.android.library'
+apply plugin: 'me.tatarka.retrolambda'
+apply plugin: 'com.jfrog.bintray'
 
 android {
     compileSdkVersion 24
     buildToolsVersion "24.0.3"
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 
     defaultConfig {
         minSdkVersion 19
@@ -30,12 +48,53 @@ android {
 }
 
 dependencies {
-    compile 'com.rapidapi:rapidconnect-android:0.1'
+    compile 'com.android.support:appcompat-v7:24.0.0'
+    compile 'com.android.support:support-v4:24.0.0'
+    compile 'com.android.support:support-annotations:24.0.0'
+
+    compile 'com.squareup.okhttp3:okhttp:3.4.2'
+    compile 'com.squareup.okio:okio:1.9.0'
+    compile 'com.google.code.gson:gson:2.8.0'
 
     compile 'io.reactivex:rxandroid:1.2.1'
     compile 'io.reactivex:rxjava:1.1.6'
 
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-all:1.10.19'
+}
 
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
+def bintrayUser = properties.getProperty('bintray.user.name')
+def bintrayApiKey = properties.getProperty('bintray.api.key')
+
+//publishing {
+//    publications {
+//        MyPublication(MavenPublication) {
+//            from components.java
+//            groupId 'com.gatebuzz'
+//            artifactId 'rxrapidapi'
+//            version '0.1'
+//        }
+//    }
+//}
+
+bintray {
+    user = bintrayUser
+    key = bintrayApiKey
+    // publications = ['MyPublication']
+    pkg {
+        repo = 'maven'
+        name = 'RxRapidApi'
+        userOrg = 'rxrapidapi'
+        licenses = ['Apache-2.0']
+        vcsUrl = 'https://github.com/psh/RxRapidApi.git'
+        version {
+            name = '0.1'
+            desc = 'Initial Release'
+            released = new Date()
+            vcsTag = 'v_0_0_1'
+            // attributes = ['gradle-plugin': 'com.use.less:com.use.less.gradle:gradle-useless-plugin']
+        }
+    }
 }
