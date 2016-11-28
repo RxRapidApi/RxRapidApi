@@ -15,6 +15,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 
 import rx.Observable;
@@ -38,7 +39,7 @@ public class InvocationHandlerTest {
 
     @Test
     public void engineConfiguredAsExpected() throws Throwable {
-        CallConfiguration configuration = new CallConfiguration("a", "b", "c", "someMethod", Arrays.asList("first", "second"), urlEncoded);
+        CallConfiguration configuration = new CallConfiguration("a", "b", "c", "someMethod", Arrays.asList("first", "second"), new HashSet<>());
         String expectedFirstParam = "d";
         String expectedSecondParam = "e";
 
