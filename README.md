@@ -5,10 +5,7 @@
 
 ## Download
 
-Files are on **jcenter**, available via Gradle:
-```
-compile(group: 'com.gatebuzz', name: 'rxrapidapi', version: '0.1', ext: 'aar', classifier: '')
-```
+Files will soon be published on **jcenter** and available via Gradle in due course.  Watch this space!
 
 ## Example Service
 Calling a service is as easy as defining a Java interface with a few annotations:
