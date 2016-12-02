@@ -1,12 +1,11 @@
 # RxRapidApi
-[RapidApi](https://www.rapidapi.com/) with a sprinkle of [RxAndroid](https://github.com/ReactiveX/RxAndroid) with just a touch of [Retrofit](https://github.com/square/retrofit) inspired syntax.
+[![Build Status](https://travis-ci.org/psh/RxRapidApi.svg?branch=master)](https://travis-ci.org/psh/RxRapidApi) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) 
+
+[RapidApi](https://www.rapidapi.com/) with a sprinkle of [RxAndroid](https://github.com/ReactiveX/RxAndroid) and just a touch of [Retrofit](https://github.com/square/retrofit) inspired syntax.
 
 ## Download
 
-Files are on **jcenter**, available via Gradle:
-```
-compile(group: 'com.gatebuzz', name: 'rxrapidapi', version: '0.1', ext: 'aar', classifier: '')
-```
+Files will soon be published on **jcenter** and available via Gradle in due course.  Watch this space!
 
 ## Example Service
 Calling a service is as easy as defining a Java interface with a few annotations:
