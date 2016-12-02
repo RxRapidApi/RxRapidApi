@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void tryTheApi() {
-        RxRapidApiBuilder.from(ZillowApi.class).getSearchResults("", BuildConfig.ZILLOW_API_KEY, "2039 yale avenue", "63143")
+        RxRapidApiBuilder.from(HackerNewsApi.class).getBestStories()
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<Map<String, Object>>() {
