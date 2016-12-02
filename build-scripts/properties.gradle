@@ -1,0 +1,17 @@
+Properties properties = new Properties()
+if (project.rootProject.file('local.properties').exists()) {
+    properties.load(project.rootProject.file('local.properties').newDataInputStream())
+}
+
+ext {
+    bintrayVersion = '0.2'
+    bintrayGroup = 'com.gatebuzz'
+    bintrayArtifact = 'rxrapidapi'
+    releaseTag = 'v_0_2'
+    releaseDescription = 'Gradle publlishing config'
+    bintrayUser = properties.getProperty('bintray.user.name')
+    bintrayApiKey = properties.getProperty('bintray.api.key')
+    rapidApiProject = properties.getProperty('rapidapi.project.name')
+    rapidApiKey = properties.getProperty('rapidapi.api.key')
+    zillowApiKey = properties.getProperty('zillow.api.key')
+}

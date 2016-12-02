@@ -1,12 +1,5 @@
 apply plugin: 'com.android.application'
-
-Properties properties = new Properties()
-if (project.rootProject.file('local.properties').exists()) {
-    properties.load(project.rootProject.file('local.properties').newDataInputStream())
-}
-def rapidApiProject = properties.getProperty('rapidapi.project.name')
-def rapidApiKey = properties.getProperty('rapidapi.api.key')
-def zillowApiKey = properties.getProperty('zillow.api.key')
+apply from: file("../build-scripts/properties.gradle")
 
 android {
     compileSdkVersion 24

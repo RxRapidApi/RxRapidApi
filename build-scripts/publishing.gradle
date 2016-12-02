@@ -1,0 +1,50 @@
+apply plugin: "maven-publish"
+apply plugin: 'com.jfrog.bintray'
+
+bintray {
+    user = bintrayUser
+    key = bintrayApiKey
+    publications = ['RxRapidApi']
+    publish = true
+    pkg {
+        repo = 'RxRapidApi'
+        name = 'RxRapidApi'
+        userOrg = 'rxrapidapi'
+        licenses = ['Apache-2.0']
+        vcsUrl = 'https://github.com/psh/RxRapidApi.git'
+        version {
+            name = "${bintrayVersion}"
+            desc = releaseDescription
+            released = new Date()
+            vcsTag = releaseTag
+        }
+    }
+}
+
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    archiveName = "${bintrayGroup}.${bintrayArtifact}-${bintrayVersion}-sources.jar"
+    from android.sourceSets.main.java.srcDirs
+}
+
+publishing {
+    publications {
+        RxRapidApi(MavenPublication) {
+            groupId bintrayGroup
+            artifactId bintrayArtifact
+            version "${bintrayVersion}"
+            artifact("$buildDir/outputs/aar/${bintrayGroup}.${bintrayArtifact}-${bintrayVersion}.aar")
+            artifact sourcesJar
+            pom.withXml {
+                def root = asNode()
+                def dependencies = root.appendNode("dependencies")
+                configurations.compile.allDependencies.each {
+                    def dependency = dependencies.appendNode("dependency")
+                    dependency?.appendNode("groupId", it["group"])
+                    dependency?.appendNode("artifactId", it["name"])
+                    dependency?.appendNode("version", it["version"])
+                }
+            }
+        }
+    }
+}

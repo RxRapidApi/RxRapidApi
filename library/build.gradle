@@ -11,8 +11,8 @@ buildscript {
 
 apply plugin: 'com.android.library'
 apply plugin: 'me.tatarka.retrolambda'
-apply plugin: "maven-publish"
-apply plugin: 'com.jfrog.bintray'
+apply from: file("../build-scripts/properties.gradle")
+apply from: file("../build-scripts/publishing.gradle")
 
 android {
     compileSdkVersion 24
@@ -27,8 +27,7 @@ android {
         minSdkVersion 19
         targetSdkVersion 24
         versionCode 1
-        versionName "1.0"
-
+        versionName bintrayVersion
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
     }
@@ -45,6 +44,13 @@ android {
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        android.libraryVariants.all { variant ->
+            if(variant.name == android.buildTypes.release.name) {
+                variant.outputs.each { output ->
+                    output.outputFile = new File(output.outputFile.parent, "${bintrayGroup}.${bintrayArtifact}-${defaultConfig.versionName}.aar")
+                }
+            }
         }
     }
 }
@@ -63,42 +69,4 @@ dependencies {
 
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-all:1.10.19'
-}
-
-Properties properties = new Properties()
-if (project.rootProject.file('local.properties').exists()) {
-    properties.load(project.rootProject.file('local.properties').newDataInputStream())
-}
-def bintrayUser = properties.getProperty('bintray.user.name')
-def bintrayApiKey = properties.getProperty('bintray.api.key')
-
-publishing {
-    publications {
-        MyPublication(MavenPublication) {
-            artifact("$buildDir/outputs/aar/library-release.aar")
-            groupId 'com.gatebuzz'
-            artifactId 'rxrapidapi'
-            version '0.1'
-        }
-    }
-}
-
-bintray {
-    user = bintrayUser
-    key = bintrayApiKey
-    publications = ['MyPublication']
-    pkg {
-        repo = 'RxRapidApi'
-        name = 'RxRapidApi'
-        userOrg = 'rxrapidapi'
-        licenses = ['Apache-2.0']
-        vcsUrl = 'https://github.com/psh/RxRapidApi.git'
-        version {
-            name = '0.1'
-            desc = 'Initial Release'
-            released = new Date()
-            vcsTag = 'v_0_0_1'
-            // attributes = ['gradle-plugin': 'com.use.less:com.use.less.gradle:gradle-useless-plugin']
-        }
-    }
 }
