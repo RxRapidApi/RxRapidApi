@@ -9,8 +9,8 @@ import java.util.Map;
 import rx.Observable;
 
 @Application(project = BuildConfig.PROJECT, key = BuildConfig.API_KEY)
+@ApiPackage("NasaAPI")
 public interface NasaApi {
-    @ApiPackage("NasaAPI")
     Observable<Map<String, Object>> getPictureOfTheDay(
             @Named("date") String date,
             @Named("highResolution") String highResolution,

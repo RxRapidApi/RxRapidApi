@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void tryTheApi() {
-        RxRapidApiBuilder.from(HackerNewsApi.class).getBestStories()
+        RxRapidApiBuilder.from(NasaApi.class).getPictureOfTheDay("","","")
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<Map<String, Object>>() {
