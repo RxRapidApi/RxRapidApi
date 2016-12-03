@@ -2,6 +2,7 @@ package com.gatebuzz.rapidapi.rx.internal;
 
 import android.support.annotation.VisibleForTesting;
 import android.support.v4.util.Pair;
+import android.util.Log;
 
 import java.lang.reflect.Method;
 import java.net.URLEncoder;
@@ -37,7 +38,9 @@ public class InvocationHandler implements java.lang.reflect.InvocationHandler {
             body.put(configuration.parameters.get(i), new Pair<>("data", value));
         }
 
-        return Observable.create(engineYard.create(configuration, body));
+        Observable<Map<String, Object>> observable = Observable.create(engineYard.create(configuration, body));
+
+        return "Single".equals(method.getReturnType().getSimpleName()) ? observable.toSingle() : observable;
     }
 
     interface EngineYard {
