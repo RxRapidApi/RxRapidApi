@@ -5,7 +5,19 @@
 
 ## Download
 
-Files will soon be published on **jcenter** and available via Gradle in due course.  Watch this space!
+RxRapidApi is available on *jcenter* via Gradle
+```
+compile 'com.gatebuzz:rxrapidapi:0.3'
+```
+or maven
+```xml
+<dependency>
+  <groupId>com.gatebuzz</groupId>
+  <artifactId>rxrapidapi</artifactId>
+  <version>0.3</version>
+  <type>pom</type>
+</dependency>
+```
 
 ## Example Service
 Calling a service is as easy as defining a Java interface with a few annotations:
