@@ -4,11 +4,11 @@ if (project.rootProject.file('local.properties').exists()) {
 }
 
 ext {
-    bintrayVersion = '0.2.2'
+    bintrayVersion = '0.3'
     bintrayGroup = 'com.gatebuzz'
     bintrayArtifact = 'rxrapidapi'
-    releaseTag = 'v_0_2_2'
-    releaseDescription = 'Gradle configuration for release'
+    releaseTag = 'v_0_3'
+    releaseDescription = 'Support for RxJava Single<> return types, more streamlined configuration and bug fixes.'
     bintrayUser = properties.getProperty('bintray.user.name')
     bintrayApiKey = properties.getProperty('bintray.api.key')
     rapidApiProject = properties.getProperty('rapidapi.project.name')
