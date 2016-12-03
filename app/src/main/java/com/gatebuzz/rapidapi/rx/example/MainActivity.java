@@ -7,12 +7,12 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 
-import com.gatebuzz.rapidapi.rx.FailedCallException;
 import com.gatebuzz.rapidapi.rx.RxRapidApiBuilder;
 
 import java.util.Map;
 
-import rx.Subscriber;
+import rx.Single;
+import rx.SingleSubscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
@@ -35,28 +35,19 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void tryTheApi() {
-        RxRapidApiBuilder.from(HackerNewsApi.class).getBestStories()
-                .subscribeOn(Schedulers.newThread())
+        Single<Map<String, Object>> foo = RxRapidApiBuilder.from(HackerNewsApi.class).getBestStories();
+
+        foo.subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<Map<String, Object>>() {
+                .subscribe(new SingleSubscriber<Map<String, Object>>() {
                     @Override
-                    public void onCompleted() {
+                    public void onSuccess(Map<String, Object> value) {
+                        Log.e("Example", "onSuccess - value = " + value);
                     }
 
                     @Override
-                    public void onError(Throwable e) {
-                        if (e instanceof FailedCallException) {
-                            Map<String, Object> response = ((FailedCallException) e).getResponse();
-                            Log.e("Example", "Call failed: " + response);
-                        } else {
-                            Log.e("Example", "Call failed badly.", e);
-                        }
-                    }
-
-                    @Override
-                    public void onNext(Map<String, Object> response) {
-                        Log.e("Example", "Call success: " + response.get("success"));
-                        Log.e("Example", "type: " + response.get("success").getClass().getSimpleName());
+                    public void onError(Throwable error) {
+                        Log.e("Example", "onError", error);
                     }
                 });
     }
