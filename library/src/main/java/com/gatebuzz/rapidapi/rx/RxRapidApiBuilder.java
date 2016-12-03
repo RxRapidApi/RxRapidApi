@@ -24,10 +24,12 @@ public abstract class RxRapidApiBuilder {
         Application applicationAnnotation = interfaceClass.getAnnotation(Application.class);
         String project = applicationAnnotation != null ? applicationAnnotation.project() : null;
         String key = applicationAnnotation != null ? applicationAnnotation.key() : null;
+        ApiPackage apiPackageAnnotation = interfaceClass.getAnnotation(ApiPackage.class);
+        String apiPackage = apiPackageAnnotation != null ? apiPackageAnnotation.value() : null;
 
         Map<String, CallConfiguration> callConfigurationMap = new HashMap<>();
         for (Method method : interfaceClass.getMethods()) {
-            callConfigurationMap.put(method.getName(), configureCall(project, key, method));
+            callConfigurationMap.put(method.getName(), configureCall(project, key, apiPackage, method));
         }
 
         return (I) Proxy.newProxyInstance(interfaceClass.getClassLoader(),
@@ -35,11 +37,16 @@ public abstract class RxRapidApiBuilder {
     }
 
     @NonNull
-    private static CallConfiguration configureCall(String project, String key, Method method) {
+    private static CallConfiguration configureCall(String project, String key, String apiPackage, Method method) {
         Application methodAppAnnotation = method.getAnnotation(Application.class);
         if (methodAppAnnotation != null) {
             project = methodAppAnnotation.project();
             key = methodAppAnnotation.key();
+        }
+
+        ApiPackage apiPackageAnnotation = method.getAnnotation(ApiPackage.class);
+        if (apiPackageAnnotation != null) {
+            apiPackage = apiPackageAnnotation.value();
         }
 
         if (project == null || project.trim().isEmpty()) {
@@ -63,15 +70,13 @@ public abstract class RxRapidApiBuilder {
                     ", found " + parameters.size() + ".");
         }
 
-        ApiPackage packageAnnotation = method.getAnnotation(ApiPackage.class);
-        String pack = packageAnnotation != null ? packageAnnotation.value() : null;
-        if (pack == null || pack.trim().isEmpty()) {
-            throw new IllegalArgumentException("API package not found on " + method.getName() + "() " +
-                    "(check the @ApiPackage annotation).");
+        if (apiPackage == null || apiPackage.trim().isEmpty()) {
+            throw new IllegalArgumentException("API package not found - check the @ApiPackage " +
+                    "annotation on the interface or on "+method.getName()+"().");
         }
 
         Set<String> urlEncodedParameters = collectUrlEncodedParameters(method, parameters);
-        return new CallConfiguration(project, key, pack, name, parameters, urlEncodedParameters);
+        return new CallConfiguration(project, key, apiPackage, name, parameters, urlEncodedParameters);
     }
 
     @NonNull

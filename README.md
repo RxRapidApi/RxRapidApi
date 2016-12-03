@@ -127,6 +127,31 @@ public interface SpotifyApi {
 }
 ```
 
+### ```@ApiPackage```
+
+The ```@ApiPackage``` annotation can also be specified at the class level to reduce noise on a given interface.  For example
+
+```java
+@Application(project = BuildConfig.PROJECT, key = BuildConfig.API_KEY)
+@ApiPackage("HackerNews")
+public interface HackerNewsApi {
+    Observable<Map<String, Object>> getNewStories();
+
+    Observable<Map<String, Object>> getBestStories();
+
+    Observable<Map<String, Object>> getAskStories();
+
+    Observable<Map<String, Object>> getShowStories();
+
+    Observable<Map<String, Object>> getJobStories();
+
+    Observable<Map<String, Object>> getUpdates();
+
+    Observable<Map<String, Object>> getUser(@Named("username") String username);
+
+    Observable<Map<String, Object>> getItem(@Named("itemId") String username);
+}
+```
 ### Method parameters
 
 The method parameter names are there for convenience and have no bearing on the parameters that are passed through to RapidApi.
