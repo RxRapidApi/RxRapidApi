@@ -127,6 +127,12 @@ public interface SpotifyApi {
 }
 ```
 
+### ```Single<>``` and ```Observable<>```
+
+RxRapidApi supports both ```Single<>``` and ```Observable<>``` as return types from interface methods.  If your API
+only needs to worry about ```onSuccess()``` and ```onError()``` then use the ```Single<>``` return type.  The ```Single<>```
+return type can be used for one-shot API calls.  See http://reactivex.io/documentation/single.html
+
 ### ```@ApiPackage```
 
 The ```@ApiPackage``` annotation can also be specified at the class level to reduce noise on a given interface.  For example
