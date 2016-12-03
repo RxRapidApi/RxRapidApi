@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Set;
 
 import okhttp3.Credentials;
+import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -26,6 +27,7 @@ import rx.Subscriber;
 @SuppressWarnings("unchecked")
 class Engine implements Observable.OnSubscribe<Map<String, Object>> {
     private static final String URL_FORMAT = "https://rapidapi.io/connect/%1$s/%2$s";
+    private static final RequestBody EMPTY = RequestBody.create(MediaType.parse("text/plain"), "");
     private final OkHttpClient client;
     private final CallConfiguration callConfiguration;
     private final Map<String, Pair<String, String>> body;
@@ -46,7 +48,7 @@ class Engine implements Observable.OnSubscribe<Map<String, Object>> {
     @Override
     public void call(Subscriber<? super Map<String, Object>> subscriber) {
         try {
-            MultipartBody requestBody = createMultipartBody();
+            RequestBody requestBody = createMultipartBody();
 
             Request request = new Request.Builder()
                     .url(String.format(URL_FORMAT, callConfiguration.pack, callConfiguration.block))
@@ -78,7 +80,11 @@ class Engine implements Observable.OnSubscribe<Map<String, Object>> {
     }
 
     @NonNull
-    private MultipartBody createMultipartBody() throws FileNotFoundException {
+    private RequestBody createMultipartBody() throws FileNotFoundException {
+        if (body.isEmpty()) {
+            return EMPTY;
+        }
+
         MultipartBody.Builder builder = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM);
 
