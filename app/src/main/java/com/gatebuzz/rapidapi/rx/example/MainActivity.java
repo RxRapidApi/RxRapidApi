@@ -35,7 +35,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void tryTheApi() {
-        Single<Map<String, Object>> foo = RxRapidApiBuilder.from(HackerNewsApi.class).getBestStories();
+        HackerNewsApi api = new RxRapidApiBuilder().endpoint(HackerNewsApi.class).build();
+
+        Single<Map<String, Object>> foo = api.getBestStories();
 
         foo.subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
