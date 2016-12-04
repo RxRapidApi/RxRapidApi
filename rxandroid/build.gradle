@@ -41,10 +41,12 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+
         release {
-            minifyEnabled true
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+
         android.libraryVariants.all { variant ->
             if(variant.name == android.buildTypes.release.name) {
                 variant.outputs.each { output ->

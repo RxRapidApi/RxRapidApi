@@ -1,15 +1,12 @@
 package com.gatebuzz.rapidapi.rx.example;
 
 import com.gatebuzz.rapidapi.rx.ApiPackage;
-import com.gatebuzz.rapidapi.rx.Application;
 import com.gatebuzz.rapidapi.rx.Named;
 
 import java.util.Map;
 
-import rx.Observable;
 import rx.Single;
 
-@Application(project = BuildConfig.PROJECT, key = BuildConfig.API_KEY)
 @ApiPackage("HackerNews")
 public interface HackerNewsApi {
     Single<Map<String, Object>> getNewStories();
@@ -26,5 +23,5 @@ public interface HackerNewsApi {
 
     Single<Map<String, Object>> getUser(@Named("username") String username);
 
-    Single<Map<String, Object>> getItem(@Named("itemId") String username);
+    Single<Map<String, Object>> getItem(@Named("itemId") Long item);
 }
