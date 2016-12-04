@@ -14,6 +14,8 @@ import static org.junit.Assert.fail;
 
 @SuppressWarnings("unused")
 public class RxRapidApiBuilderTest {
+
+    //region Builder methods
     @Test
     public void simpleBuilder() {
         RxRapidApiBuilder builder = new RxRapidApiBuilder();
@@ -21,9 +23,63 @@ public class RxRapidApiBuilderTest {
         RxRapidApiBuilder stepTwo = builder.endpoint(BasicInterface.class);
         assertSame(builder, stepTwo);
 
-        BasicInterface result = stepTwo.build();
+        RxRapidApiBuilder stepThree = builder.application("c", "d");
+        assertSame(builder, stepThree);
+
+        BasicInterface result = stepThree.build();
         assertNotNull(result);
     }
+
+    @Test
+    public void applicationMethodOnBuilderProvidesProject() {
+        try {
+            new RxRapidApiBuilder()
+                    .endpoint(MissingApplicationAnnotation.class)
+                    .application("a", "b")
+                    .build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail("No exception expected");
+        }
+    }
+
+    @Test
+    public void applicationMethodOnBuilderHandlesEmptyProject() {
+        try {
+            new RxRapidApiBuilder()
+                    .endpoint(MissingApplicationAnnotation.class)
+                    .application(" ", "b")
+                    .build();
+        } catch (Exception e) {
+            assertEquals("Project name not found (check the @Application annotation).", e.getMessage());
+        }
+    }
+
+    @Test
+    public void applicationMethodOnBuilderHandlesEmptyKey() {
+        try {
+            new RxRapidApiBuilder()
+                    .endpoint(MissingApplicationAnnotation.class)
+                    .application("a", " ")
+                    .build();
+        } catch (Exception e) {
+            assertEquals("API key not found (check the @Application annotation).", e.getMessage());
+        }
+    }
+
+    @Test
+    public void apiPackageMethodOnBuilderProvidesThePackage() {
+        try {
+            new RxRapidApiBuilder()
+                    .endpoint(ApiPackageMissing.class)
+                    .apiPackage("a")
+                    .build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail("No exception expected");
+        }
+    }
+    //endregion
 
     //region @Application annotation
     @Test
@@ -57,22 +113,20 @@ public class RxRapidApiBuilderTest {
     }
 
     @Test
-    public void emptyProjectInMethodApplicationAnnotation() {
+    public void emptyProjectInMethodApplicationAnnotationDefaultsToClassLevel() {
         try {
-            new RxRapidApiBuilder().endpoint(OverriddenProjectIsMissing.class).build();
-            fail("Exception expected");
+            new RxRapidApiBuilder().endpoint(OverriddenProjectIsMissingDefaultsToClassLevel.class).build();
         } catch (IllegalArgumentException e) {
-            assertEquals("Project name not found (check the @Application annotation).", e.getMessage());
+            fail("No exception expected");
         }
     }
 
     @Test
-    public void emptyKeyInMethodApplicationAnnotation() {
+    public void emptyKeyInMethodApplicationAnnotationDefaultsToClassLevelValue() {
         try {
-            new RxRapidApiBuilder().endpoint(OverriddenKeyIsMissing.class).build();
-            fail("Exception expected");
+            new RxRapidApiBuilder().endpoint(OverriddenKeyIsMissingDefaultsToClassLevel.class).build();
         } catch (IllegalArgumentException e) {
-            assertEquals("API key not found (check the @Application annotation).", e.getMessage());
+            fail("No exception expected");
         }
     }
     //endregion
@@ -120,6 +174,7 @@ public class RxRapidApiBuilderTest {
 
     //region @Application annotation interfaces
     private interface MissingApplicationAnnotation {
+        @ApiPackage("c")
         Observable<Map<String, Object>> someMethod();
     }
 
@@ -134,14 +189,16 @@ public class RxRapidApiBuilderTest {
     }
 
     @Application(project = "a", key = "a")
-    private interface OverriddenProjectIsMissing {
+    private interface OverriddenProjectIsMissingDefaultsToClassLevel {
         @Application(project = "", key = "a")
+        @ApiPackage("c")
         Observable<Map<String, Object>> someMethod();
     }
 
     @Application(project = "a", key = "a")
-    private interface OverriddenKeyIsMissing {
+    private interface OverriddenKeyIsMissingDefaultsToClassLevel {
         @Application(project = "b", key = "")
+        @ApiPackage("c")
         Observable<Map<String, Object>> someMethod();
     }
 

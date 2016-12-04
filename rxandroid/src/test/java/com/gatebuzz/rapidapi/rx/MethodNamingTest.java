@@ -21,6 +21,7 @@ public class MethodNamingTest {
     }
 
     @Application(project = "a", key = "a")
+    @ApiPackage("c")
     private interface MethodNameMissing {
         @Named("")
         Observable<Map<String, Object>> someMethod();
