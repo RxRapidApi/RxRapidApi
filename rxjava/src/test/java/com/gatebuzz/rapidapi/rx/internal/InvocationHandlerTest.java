@@ -1,7 +1,5 @@
 package com.gatebuzz.rapidapi.rx.internal;
 
-import android.support.v4.util.Pair;
-
 import com.gatebuzz.rapidapi.rx.ApiPackage;
 import com.gatebuzz.rapidapi.rx.Application;
 import com.gatebuzz.rapidapi.rx.Named;

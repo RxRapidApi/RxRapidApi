@@ -1,10 +1,7 @@
 package com.gatebuzz.rapidapi.rx;
 
-import android.support.annotation.Keep;
-
 import java.util.Map;
 
-@Keep
 public class FailedCallException extends Throwable {
     private final Map<String, Object> response;
 

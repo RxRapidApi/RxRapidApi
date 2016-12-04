@@ -1,7 +1,5 @@
 package com.gatebuzz.rapidapi.rx;
 
-import android.support.annotation.Keep;
-
 import com.gatebuzz.rapidapi.rx.internal.CallConfiguration;
 import com.gatebuzz.rapidapi.rx.internal.InvocationHandler;
 
@@ -10,7 +8,6 @@ import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.Map;
 
-@Keep
 public class RxRapidApiBuilder {
 
     private Class<?> interfaceClass;

@@ -1,7 +1,5 @@
 package com.gatebuzz.rapidapi.rx.internal;
 
-import android.support.v4.util.Pair;
-
 import com.gatebuzz.rapidapi.rx.FailedCallException;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;

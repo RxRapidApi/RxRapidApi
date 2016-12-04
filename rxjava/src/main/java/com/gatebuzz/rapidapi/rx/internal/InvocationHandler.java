@@ -1,7 +1,5 @@
 package com.gatebuzz.rapidapi.rx.internal;
 
-import android.support.v4.util.Pair;
-
 import java.lang.reflect.Method;
 import java.net.URLEncoder;
 import java.util.HashMap;
