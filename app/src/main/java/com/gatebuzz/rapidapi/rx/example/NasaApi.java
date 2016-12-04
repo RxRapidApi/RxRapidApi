@@ -11,8 +11,10 @@ import rx.Observable;
 @Application(project = BuildConfig.PROJECT, key = BuildConfig.API_KEY)
 @ApiPackage("NasaAPI")
 public interface NasaApi {
+
     Observable<Map<String, Object>> getPictureOfTheDay(
             @Named("date") String date,
             @Named("highResolution") String highResolution,
             @Named("apiKey") String apiKey);
+
 }

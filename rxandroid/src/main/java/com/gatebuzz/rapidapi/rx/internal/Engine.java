@@ -1,7 +1,5 @@
 package com.gatebuzz.rapidapi.rx.internal;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.VisibleForTesting;
 import android.support.v4.util.Pair;
 
 import com.gatebuzz.rapidapi.rx.FailedCallException;
@@ -24,24 +22,19 @@ import okhttp3.Response;
 import rx.Observable;
 import rx.Subscriber;
 
-@SuppressWarnings("unchecked")
 class Engine implements Observable.OnSubscribe<Map<String, Object>> {
     private static final String URL_FORMAT = "https://rapidapi.io/connect/%1$s/%2$s";
     private static final RequestBody EMPTY = RequestBody.create(MediaType.parse("text/plain"), "");
+
     private final OkHttpClient client;
     private final CallConfiguration callConfiguration;
     private final Map<String, Pair<String, String>> body;
     private final Gson gson;
 
     Engine(CallConfiguration callConfiguration, Map<String, Pair<String, String>> body) {
-        this(callConfiguration, body, new OkHttpClient());
-    }
-
-    @VisibleForTesting
-    Engine(CallConfiguration callConfiguration, Map<String, Pair<String, String>> body, OkHttpClient client) {
         this.callConfiguration = callConfiguration;
         this.body = body;
-        this.client = client;
+        this.client = new OkHttpClient();
         this.gson = new Gson();
     }
 
@@ -52,12 +45,12 @@ class Engine implements Observable.OnSubscribe<Map<String, Object>> {
 
             Request request = new Request.Builder()
                     .url(String.format(URL_FORMAT, callConfiguration.pack, callConfiguration.block))
-                    .addHeader("User-Agent", "RapidAPIConnect_Java")
+                    .addHeader("User-Agent", "RapidAPIConnect_RxRapidApi")
                     .addHeader("Authorization", Credentials.basic(callConfiguration.project, callConfiguration.key))
                     .post(requestBody)
                     .build();
 
-            Response response = this.client.newCall(request).execute();
+            Response response = client.newCall(request).execute();
             Map<String, Object> map = fromJson(response.body().string());
 
             Map<String, Object> result = new HashMap<>();
@@ -79,7 +72,7 @@ class Engine implements Observable.OnSubscribe<Map<String, Object>> {
         }.getType());
     }
 
-    @NonNull
+    @SuppressWarnings("unchecked")
     private RequestBody createMultipartBody() throws FileNotFoundException {
         if (body.isEmpty()) {
             return EMPTY;

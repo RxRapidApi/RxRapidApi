@@ -8,7 +8,7 @@ ext {
     bintrayGroup = 'com.gatebuzz'
     bintrayArtifact = 'rxrapidapi'
     releaseTag = 'v_0_5_0'
-    releaseDescription = 'Internal restructuring.'
+    releaseDescription = 'Improved builder'
     bintrayUser = properties.getProperty('bintray.user.name')
     bintrayApiKey = properties.getProperty('bintray.api.key')
     rapidApiProject = properties.getProperty('rapidapi.project.name')

@@ -6,7 +6,7 @@ import java.util.Map;
 
 @Keep
 public class FailedCallException extends Throwable {
-    private Map<String, Object> response;
+    private final Map<String, Object> response;
 
     public FailedCallException(Map<String, Object> response) {
         this.response = response;

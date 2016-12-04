@@ -21,6 +21,7 @@ public class MethodParameterNamingTest {
     }
 
     @Application(project = "a", key = "a")
+    @ApiPackage("c")
     private interface MethodParameterNameMissing {
         Observable<Map<String, Object>> someMethod(String missingAnnotation);
     }

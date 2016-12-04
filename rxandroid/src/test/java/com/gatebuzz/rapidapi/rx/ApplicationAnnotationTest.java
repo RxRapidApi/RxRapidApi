@@ -41,22 +41,20 @@ public class ApplicationAnnotationTest {
     }
 
     @Test
-    public void emptyProjectInMethodApplicationAnnotation() {
+    public void emptyProjectInMethodApplicationAnnotationDefaultsToClassLevel() {
         try {
             RxRapidApiBuilder.from(OverriddenProjectIsMissing.class);
-            fail("Exception expected");
         } catch (IllegalArgumentException e) {
-            assertEquals("Project name not found (check the @Application annotation).", e.getMessage());
+            fail("No exception expected");
         }
     }
 
     @Test
-    public void emptyKeyInMethodApplicationAnnotation() {
+    public void emptyKeyInMethodApplicationAnnotationDefaultsToClassLevel() {
         try {
             RxRapidApiBuilder.from(OverriddenKeyIsMissing.class);
-            fail("Exception expected");
         } catch (IllegalArgumentException e) {
-            assertEquals("API key not found (check the @Application annotation).", e.getMessage());
+            fail("No exception expected");
         }
     }
 
@@ -78,12 +76,14 @@ public class ApplicationAnnotationTest {
     @Application(project = "a", key = "a")
     private interface OverriddenProjectIsMissing {
         @Application(project = "", key = "a")
+        @ApiPackage("c")
         Observable<Map<String, Object>> someMethod();
     }
 
     @Application(project = "a", key = "a")
     private interface OverriddenKeyIsMissing {
         @Application(project = "b", key = "")
+        @ApiPackage("c")
         Observable<Map<String, Object>> someMethod();
     }
 }
