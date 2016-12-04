@@ -9,7 +9,7 @@ import rx.Observable;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-public class MethodNaming {
+public class MethodNamingTest {
     @Test
     public void overriddenMethodNameMissing() {
         try {

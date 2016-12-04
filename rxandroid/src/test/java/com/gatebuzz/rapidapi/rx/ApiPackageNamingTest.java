@@ -9,7 +9,7 @@ import rx.Observable;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-public class ApiPackageNaming {
+public class ApiPackageNamingTest {
     @Test
     public void annotationMissing() {
         try {

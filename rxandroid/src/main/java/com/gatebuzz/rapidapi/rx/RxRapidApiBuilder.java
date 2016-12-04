@@ -17,10 +17,22 @@ import java.util.Map;
 import java.util.Set;
 
 @Keep
-public abstract class RxRapidApiBuilder {
+public class RxRapidApiBuilder {
+
+    private Class<?> interfaceClass;
 
     @SuppressWarnings("unchecked")
     public static <I> I from(Class<I> interfaceClass) {
+        return new RxRapidApiBuilder().endpoint(interfaceClass).build();
+    }
+
+    public RxRapidApiBuilder endpoint(Class<?> endpoint) {
+        this.interfaceClass = endpoint;
+        return this;
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> T build() {
         Application applicationAnnotation = interfaceClass.getAnnotation(Application.class);
         String project = applicationAnnotation != null ? applicationAnnotation.project() : null;
         String key = applicationAnnotation != null ? applicationAnnotation.key() : null;
@@ -32,12 +44,12 @@ public abstract class RxRapidApiBuilder {
             callConfigurationMap.put(method.getName(), configureCall(project, key, apiPackage, method));
         }
 
-        return (I) Proxy.newProxyInstance(interfaceClass.getClassLoader(),
+        return (T) Proxy.newProxyInstance(interfaceClass.getClassLoader(),
                 new Class[]{interfaceClass}, new InvocationHandler(callConfigurationMap));
     }
 
     @NonNull
-    private static CallConfiguration configureCall(String project, String key, String apiPackage, Method method) {
+    private CallConfiguration configureCall(String project, String key, String apiPackage, Method method) {
         Application methodAppAnnotation = method.getAnnotation(Application.class);
         if (methodAppAnnotation != null) {
             project = methodAppAnnotation.project();
@@ -80,13 +92,13 @@ public abstract class RxRapidApiBuilder {
     }
 
     @NonNull
-    private static String collectRemoteMethodName(Method method) {
+    private String collectRemoteMethodName(Method method) {
         Named methodNameAnnotation = method.getAnnotation(Named.class);
         return (methodNameAnnotation != null) ? methodNameAnnotation.value() : method.getName();
     }
 
     @NonNull
-    private static List<String> collectParameterNames(Method method) {
+    private List<String> collectParameterNames(Method method) {
         Annotation[][] parameterAnnotations = method.getParameterAnnotations();
         List<String> parameters = new ArrayList<>();
         for (Annotation[] annotations : parameterAnnotations) {
@@ -100,7 +112,7 @@ public abstract class RxRapidApiBuilder {
     }
 
     @NonNull
-    private static Set<String> collectUrlEncodedParameters(Method method, List<String> names) {
+    private Set<String> collectUrlEncodedParameters(Method method, List<String> names) {
         Set<String> parameters = new HashSet<>();
         Annotation[][] parameterAnnotations = method.getParameterAnnotations();
         for (int i = 0; i < parameterAnnotations.length; i++) {
