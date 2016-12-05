@@ -3,7 +3,7 @@
 
 [RapidApi](https://www.rapidapi.com/) with a sprinkle of [RxJava](https://github.com/ReactiveX/RxJava) and just a touch of [Retrofit](https://github.com/square/retrofit) inspired syntax.
 
-## Download
+# Download
 
 RxRapidApi is available on *jcenter* via Gradle
 ```
@@ -19,7 +19,7 @@ or maven
 </dependency>
 ```
 
-## Documentation
+# Documentation
 
 Documentation is available on the [wiki](https://github.com/psh/RxRapidApi/wiki).
 
