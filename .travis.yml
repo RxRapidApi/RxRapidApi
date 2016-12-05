@@ -13,4 +13,4 @@ before_install:
   - export JAVA8_HOME=/usr/lib/jvm/java-8-oracle
   - export JAVA_HOME=$JAVA8_HOME
 script:
-  - ./gradlew clean assemble || ./gradlew clean assemble
+  - ./gradlew clean assemble test || ./gradlew clean assemble test
