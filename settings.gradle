@@ -1,1 +1,1 @@
-include ':app', ':rxandroid', ':rxjava'
+include ':app', ':rxjava'

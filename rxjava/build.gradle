@@ -5,11 +5,14 @@ buildscript {
 
     dependencies {
         classpath 'me.tatarka:gradle-retrolambda:3.3.0'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7'
     }
 }
 
 apply plugin: 'java'
 apply plugin: 'me.tatarka.retrolambda'
+apply from: file("../build-scripts/properties.gradle")
+apply from: file("../build-scripts/publishing.gradle")
 
 dependencies {
     compile 'com.squareup.okhttp3:okhttp:3.4.2'
@@ -24,3 +27,7 @@ dependencies {
 
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
+
+retrolambda {
+    oldJdk java7Jdk
+}
