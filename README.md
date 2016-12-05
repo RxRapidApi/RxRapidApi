@@ -1,5 +1,5 @@
 # RxRapidApi
-[![Build Status](https://travis-ci.org/psh/RxRapidApi.svg?branch=master)](https://travis-ci.org/psh/RxRapidApi) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) [![Stories in Ready](https://badge.waffle.io/psh/RxRapidApi.png?label=ready&title=Ready)](https://waffle.io/psh/RxRapidApi)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) [![Stories in Ready](https://badge.waffle.io/psh/RxRapidApi.png?label=ready&title=Ready)](https://waffle.io/psh/RxRapidApi)
 
 [RapidApi](https://www.rapidapi.com/) with a sprinkle of [RxJava](https://github.com/ReactiveX/RxJava) and just a touch of [Retrofit](https://github.com/square/retrofit) inspired syntax.
 
