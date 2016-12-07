@@ -1,0 +1,18 @@
+apply plugin: 'java'
+apply plugin: 'application'
+
+mainClassName = 'com.gatebuzz.rxrapidapi.rx.example.ExampleApp'
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
+
+dependencies {
+    // Use this relative reference if you want to depend on the "live" development you
+    // are doing in the 'rxjava' module
+    //
+    // compile project(':rxjava')
+    //
+
+    // Use this jcenter reference to depend on the current production (stable) version
+    compile 'com.gatebuzz:rxrapidapi:0.5.2'
+}
+
