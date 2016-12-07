@@ -1,5 +1,16 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+
+    dependencies {
+        classpath 'me.tatarka:gradle-retrolambda:3.3.0'
+    }
+}
+
 apply plugin: 'com.android.application'
 apply from: file("../build-scripts/properties.gradle")
+apply plugin: 'me.tatarka.retrolambda'
 
 android {
     compileSdkVersion 24
@@ -14,6 +25,11 @@ android {
         buildConfigField "String", "PROJECT", "\"${rapidApiProject}\""
         buildConfigField "String", "API_KEY", "\"${rapidApiKey}\""
         buildConfigField "String", "ZILLOW_API_KEY", "\"${zillowApiKey}\""
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 
     lintOptions {
@@ -35,6 +51,7 @@ dependencies {
     // are doing in the 'rxjava' module
     //
     // compile project(':rxjava')
+    //
 
     // Use this jcenter reference to depend on the current production (stable) version
     compile 'com.gatebuzz:rxrapidapi:0.5.2'
