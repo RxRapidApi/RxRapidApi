@@ -4,13 +4,14 @@ buildscript {
     }
 
     dependencies {
+        classpath 'com.android.tools.build:gradle:2.2.3'
         classpath 'me.tatarka:gradle-retrolambda:3.3.0'
     }
 }
 
 apply plugin: 'com.android.application'
-apply from: file("../build-scripts/properties.gradle")
 apply plugin: 'me.tatarka.retrolambda'
+apply from: file("../build-scripts/properties.gradle")
 
 android {
     compileSdkVersion 24
@@ -47,7 +48,7 @@ android {
 dependencies {
     compile 'io.reactivex:rxandroid:1.2.1'
 
-    // Use this relative reference if you want to depend on the "live" developmen you
+    // Use this relative reference if you want to depend on the "live" development you
     // are doing in the 'rxjava' module
     //
     // compile project(':rxjava')

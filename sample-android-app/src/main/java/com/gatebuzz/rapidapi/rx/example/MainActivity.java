@@ -23,10 +23,14 @@ import static com.gatebuzz.rapidapi.rx.example.BuildConfig.PROJECT;
 public class MainActivity extends AppCompatActivity {
 
     public static final String SPOTIFY_PUBLIC_API = "SpotifyPublicAPI";
-    @SuppressWarnings("FieldCanBeLocal") private NasaApi nasaApi;
-    @SuppressWarnings("FieldCanBeLocal") private SpotifyApi spotifyApi;
-    @SuppressWarnings("FieldCanBeLocal") private ZillowApi zillowApi;
-    @SuppressWarnings("FieldCanBeLocal") private HackerNewsApi hackerNewsApi;
+    @SuppressWarnings("FieldCanBeLocal")
+    private NasaApi nasaApi;
+    @SuppressWarnings("FieldCanBeLocal")
+    private SpotifyApi spotifyApi;
+    @SuppressWarnings("FieldCanBeLocal")
+    private ZillowApi zillowApi;
+    @SuppressWarnings("FieldCanBeLocal")
+    private HackerNewsApi hackerNewsApi;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,12 +60,7 @@ public class MainActivity extends AppCompatActivity {
                 .build();
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                tryTheApi();
-            }
-        });
+        fab.setOnClickListener(view -> tryTheApi());
     }
 
     private void tryTheApi() {
