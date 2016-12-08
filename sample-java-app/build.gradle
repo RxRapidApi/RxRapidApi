@@ -14,5 +14,7 @@ dependencies {
 
     // Use this jcenter reference to depend on the current production (stable) version
     compile 'com.gatebuzz:rxrapidapi:0.5.2'
+
+    compile 'io.reactivex:rxjavafx:0.3.0'
 }
 
