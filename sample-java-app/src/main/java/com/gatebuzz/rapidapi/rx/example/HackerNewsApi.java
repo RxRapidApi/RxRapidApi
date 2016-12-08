@@ -8,7 +8,7 @@ import java.util.Map;
 
 import rx.Observable;
 
-@Application(project = "<project>", key = "<api key>")
+@Application(project = "RxRapidApi_Demo", key = "e21f74d4-1cb0-4476-92fd-a81fb29d6fa0")
 @ApiPackage("HackerNews")
 public interface HackerNewsApi {
     Observable<Map<String, Object>> getNewStories();
