@@ -7,15 +7,15 @@ import java.util.Map;
 
 import rx.Observable;
 
-public class InvocationHandler implements java.lang.reflect.InvocationHandler {
+public class CallHandler implements java.lang.reflect.InvocationHandler {
     private final Map<String, CallConfiguration> callConfigurationMap;
     private final EngineYard engineYard;
 
-    public InvocationHandler(Map<String, CallConfiguration> callConfigurationMap) {
+    public CallHandler(Map<String, CallConfiguration> callConfigurationMap) {
         this(callConfigurationMap, new DefaultEngineYard());
     }
 
-    InvocationHandler(Map<String, CallConfiguration> callConfigurationMap, EngineYard engineYard) {
+    CallHandler(Map<String, CallConfiguration> callConfigurationMap, EngineYard engineYard) {
         this.callConfigurationMap = callConfigurationMap;
         this.engineYard = engineYard;
     }
@@ -32,6 +32,16 @@ public class InvocationHandler implements java.lang.reflect.InvocationHandler {
                 value = URLEncoder.encode(value, "UTF-8");
             }
             body.put(parameter, new Pair<>("data", value));
+        }
+        if (configuration.defaultValueNames != null) {
+            for (String defaultValueName : configuration.defaultValueNames) {
+                String methodValue = configuration.methodLevelDefaults.get(defaultValueName);
+                String classValue = configuration.classLevelDefaults.get(defaultValueName);
+                String value = methodValue != null ? methodValue : classValue != null ? classValue : null;
+                if (value != null) {
+                    body.put(defaultValueName, new Pair<>("data", value));
+                }
+            }
         }
 
         Observable<Map<String, Object>> observable = Observable.create(engineYard.create(configuration, body));

@@ -1,7 +1,18 @@
 package com.gatebuzz.rapidapi.rx;
 
-import org.junit.Test;
+import com.gatebuzz.rapidapi.rx.internal.CallConfiguration;
+import com.gatebuzz.rapidapi.rx.internal.CallHandlerFactory;
 
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 import rx.Observable;
@@ -11,9 +22,15 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.fail;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.verify;
 
 @SuppressWarnings("unused")
+@RunWith(MockitoJUnitRunner.class)
 public class RxRapidApiBuilderTest {
+
+    @Mock private CallHandlerFactory callHandlerFactory;
+    @Captor private ArgumentCaptor<Map<String, CallConfiguration>> captor;
 
     //region Builder methods
     @Test
@@ -26,7 +43,19 @@ public class RxRapidApiBuilderTest {
         RxRapidApiBuilder stepThree = builder.application("c", "d");
         assertSame(builder, stepThree);
 
-        BasicInterface result = stepThree.build();
+        RxRapidApiBuilder stepFour = builder.defaultValue("e", "f");
+        assertSame(builder, stepFour);
+
+        RxRapidApiBuilder stepFive = builder.defaultValue("g", "h", "i");
+        assertSame(builder, stepFive);
+
+        RxRapidApiBuilder stepSix = builder.defaultValues(new HashMap<>());
+        assertSame(builder, stepSix);
+
+        RxRapidApiBuilder stepSeven = builder.defaultValues("g", new HashMap<>());
+        assertSame(builder, stepSeven);
+
+        BasicInterface result = stepFive.build();
         assertNotNull(result);
     }
 
@@ -78,6 +107,189 @@ public class RxRapidApiBuilderTest {
             e.printStackTrace();
             fail("No exception expected");
         }
+    }
+
+    @Test
+    public void singleClassLevelDefaultPassedThrough() {
+        new RxRapidApiBuilder(callHandlerFactory)
+                .endpoint(SingleClassLevelDefaultBuilderTestClass.class)
+                .defaultValue("key", "value")
+                .build();
+
+        verify(callHandlerFactory).create(eq(SingleClassLevelDefaultBuilderTestClass.class), captor.capture());
+        Map<String, CallConfiguration> configMap = captor.getValue();
+        assertEquals(1, configMap.size());
+
+        CallConfiguration config = configMap.get("someMethod");
+        assertEquals("a", config.project);
+        assertEquals("b", config.key);
+        assertEquals(1, config.classLevelDefaults.size());
+        assertEquals("value", config.classLevelDefaults.get("key"));
+    }
+
+    @Test
+    public void multipleClassLevelDefaults() {
+        new RxRapidApiBuilder(callHandlerFactory)
+                .endpoint(SingleClassLevelDefaultBuilderTestClass.class)
+                .defaultValue("key1", "value1")
+                .defaultValue("key2", "value2")
+                .build();
+
+        verify(callHandlerFactory).create(eq(SingleClassLevelDefaultBuilderTestClass.class), captor.capture());
+        Map<String, CallConfiguration> configMap = captor.getValue();
+        assertEquals(1, configMap.size());
+
+        CallConfiguration config = configMap.get("someMethod");
+        assertEquals("a", config.project);
+        assertEquals("b", config.key);
+        assertEquals(2, config.classLevelDefaults.size());
+        assertEquals("value1", config.classLevelDefaults.get("key1"));
+        assertEquals("value2", config.classLevelDefaults.get("key2"));
+    }
+
+    @Test
+    public void multipleClassLevelDefaultsFromMap() {
+        new RxRapidApiBuilder(callHandlerFactory)
+                .endpoint(SingleClassLevelDefaultBuilderTestClass.class)
+                .defaultValues(new HashMap<String, String>() {{
+                    put("key1", "value1");
+                    put("key2", "value2");
+                }})
+                .build();
+
+        verify(callHandlerFactory).create(eq(SingleClassLevelDefaultBuilderTestClass.class), captor.capture());
+        Map<String, CallConfiguration> configMap = captor.getValue();
+        assertEquals(1, configMap.size());
+
+        CallConfiguration config = configMap.get("someMethod");
+        assertEquals("a", config.project);
+        assertEquals("b", config.key);
+        assertEquals(2, config.classLevelDefaults.size());
+        assertEquals("value1", config.classLevelDefaults.get("key1"));
+        assertEquals("value2", config.classLevelDefaults.get("key2"));
+    }
+
+    @Test
+    public void multipleClassLevelDefaultsFromMapAndSingleValues() {
+        new RxRapidApiBuilder(callHandlerFactory)
+                .endpoint(SingleClassLevelDefaultBuilderTestClass.class)
+                .defaultValues(new HashMap<String, String>() {{
+                    put("key1", "value1");
+                    put("key2", "value2");
+                }})
+                .defaultValue("key3", "value3")
+                .build();
+
+        verify(callHandlerFactory).create(eq(SingleClassLevelDefaultBuilderTestClass.class), captor.capture());
+        Map<String, CallConfiguration> configMap = captor.getValue();
+        assertEquals(1, configMap.size());
+
+        CallConfiguration config = configMap.get("someMethod");
+        assertEquals("a", config.project);
+        assertEquals("b", config.key);
+        assertEquals(3, config.classLevelDefaults.size());
+        assertEquals("value1", config.classLevelDefaults.get("key1"));
+        assertEquals("value2", config.classLevelDefaults.get("key2"));
+        assertEquals("value3", config.classLevelDefaults.get("key3"));
+    }
+
+    @Test
+    public void singleMethodLevelDefaultValue() {
+        new RxRapidApiBuilder(callHandlerFactory)
+                .endpoint(SingleClassLevelDefaultBuilderTestClass.class)
+                .defaultValue("someMethod", "key", "value")
+                .build();
+
+        verify(callHandlerFactory).create(eq(SingleClassLevelDefaultBuilderTestClass.class), captor.capture());
+        CallConfiguration config = captor.getValue().get("someMethod");
+        assertEquals(1, config.methodLevelDefaults.size());
+        assertEquals("value", config.methodLevelDefaults.get("key"));
+    }
+
+    @Test
+    public void multipleMethodLevelDefaultsFromMap() {
+        new RxRapidApiBuilder(callHandlerFactory)
+                .endpoint(SingleClassLevelDefaultBuilderTestClass.class)
+                .defaultValues("someMethod", new HashMap<String, String>() {{
+                    put("key1", "value1");
+                    put("key2", "value2");
+                }})
+                .build();
+
+        verify(callHandlerFactory).create(eq(SingleClassLevelDefaultBuilderTestClass.class), captor.capture());
+        CallConfiguration config = captor.getValue().get("someMethod");
+        assertEquals(2, config.methodLevelDefaults.size());
+        assertEquals("value1", config.methodLevelDefaults.get("key1"));
+        assertEquals("value2", config.methodLevelDefaults.get("key2"));
+    }
+
+    @Test
+    public void multipleMethodLevelDefaultsFromMapAndSingleValues() {
+        new RxRapidApiBuilder(callHandlerFactory)
+                .endpoint(SingleClassLevelDefaultBuilderTestClass.class)
+                .defaultValues("someMethod", new HashMap<String, String>() {{
+                    put("key1", "value1");
+                    put("key2", "value2");
+                }})
+                .defaultValue("someMethod", "key3", "value3")
+                .build();
+
+        verify(callHandlerFactory).create(eq(SingleClassLevelDefaultBuilderTestClass.class), captor.capture());
+        CallConfiguration config = captor.getValue().get("someMethod");
+        assertEquals(3, config.methodLevelDefaults.size());
+        assertEquals("value1", config.methodLevelDefaults.get("key1"));
+        assertEquals("value2", config.methodLevelDefaults.get("key2"));
+        assertEquals("value3", config.methodLevelDefaults.get("key3"));
+    }
+
+    @Test
+    public void classLevelDefaultValueNamesPassedDownToConfig() {
+        new RxRapidApiBuilder(callHandlerFactory)
+                .endpoint(SingleClassLevelDefaultBuilderTestClass.class)
+                .build();
+        verify(callHandlerFactory).create(eq(SingleClassLevelDefaultBuilderTestClass.class), captor.capture());
+        CallConfiguration config = captor.getValue().get("someMethod");
+        assertEquals(Collections.singletonList("key"), config.defaultValueNames);
+    }
+
+    @Test
+    public void multipleClassLevelDefaultValueNamesPassedDownToConfig() {
+        new RxRapidApiBuilder(callHandlerFactory)
+                .endpoint(MultipleClassLevelDefaultBuilderTestClass.class)
+                .build();
+        verify(callHandlerFactory).create(eq(MultipleClassLevelDefaultBuilderTestClass.class), captor.capture());
+        CallConfiguration config = captor.getValue().get("someMethod");
+        assertEquals(Arrays.asList("key1", "key2"), config.defaultValueNames);
+    }
+
+    @Test
+    public void methodLevelDefaultValueNamesPassedDownToConfig() {
+        new RxRapidApiBuilder(callHandlerFactory)
+                .endpoint(SingleMethodLevelDefaultBuilderTestClass.class)
+                .build();
+        verify(callHandlerFactory).create(eq(SingleMethodLevelDefaultBuilderTestClass.class), captor.capture());
+        CallConfiguration config = captor.getValue().get("someMethod");
+        assertEquals(Collections.singletonList("key"), config.defaultValueNames);
+    }
+
+    @Test
+    public void multipleMethodLevelDefaultValueNamesPassedDownToConfig() {
+        new RxRapidApiBuilder(callHandlerFactory)
+                .endpoint(MultipleMethodLevelDefaultBuilderTestClass.class)
+                .build();
+        verify(callHandlerFactory).create(eq(MultipleMethodLevelDefaultBuilderTestClass.class), captor.capture());
+        CallConfiguration config = captor.getValue().get("someMethod");
+        assertEquals(Arrays.asList("key1", "key2"), config.defaultValueNames);
+    }
+
+    @Test
+    public void multipleDefaultValueNamesPassedDownToConfig() {
+        new RxRapidApiBuilder(callHandlerFactory)
+                .endpoint(MultipleDefaultNamesBuilderTestClass.class)
+                .build();
+        verify(callHandlerFactory).create(eq(MultipleDefaultNamesBuilderTestClass.class), captor.capture());
+        assertEquals(Arrays.asList("key1", "key2", "key3", "key4"), captor.getValue().get("someMethod").defaultValueNames);
+        assertEquals(Arrays.asList("key1", "key2", "key5"), captor.getValue().get("someOtherMethod").defaultValueNames);
     }
     //endregion
 
@@ -169,6 +381,47 @@ public class RxRapidApiBuilderTest {
         } catch(Exception e) {
             fail("No exception expected");
         }
+    }
+    //endregion
+
+    //region Builder interfaces
+    @Application(project = "a", key = "b")
+    @DefaultValues("key")
+    private interface SingleClassLevelDefaultBuilderTestClass {
+        @ApiPackage("c")
+        Observable<Map<String, Object>> someMethod();
+    }
+
+    @Application(project = "a", key = "b")
+    private interface SingleMethodLevelDefaultBuilderTestClass {
+        @ApiPackage("c")
+        @DefaultValues("key")
+        Observable<Map<String, Object>> someMethod();
+    }
+
+    @Application(project = "a", key = "b")
+    @DefaultValues({"key1", "key2"})
+    private interface MultipleClassLevelDefaultBuilderTestClass {
+        @ApiPackage("c")
+        Observable<Map<String, Object>> someMethod();
+    }
+
+    @Application(project = "a", key = "b")
+    private interface MultipleMethodLevelDefaultBuilderTestClass {
+        @ApiPackage("c")
+        @DefaultValues({"key1", "key2"})
+        Observable<Map<String, Object>> someMethod();
+    }
+
+    @Application(project = "a", key = "b")
+    @DefaultValues({"key1", "key2"})
+    @ApiPackage("c")
+    private interface MultipleDefaultNamesBuilderTestClass {
+        @DefaultValues({"key3", "key4"})
+        Observable<Map<String, Object>> someMethod();
+
+        @DefaultValues("key5")
+        Observable<Map<String, Object>> someOtherMethod();
     }
     //endregion
 

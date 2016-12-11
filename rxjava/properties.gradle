@@ -4,17 +4,14 @@ if (project.rootProject.file('local.properties').exists()) {
 }
 
 ext {
-    bintrayVersion = '0.5.2'
+    bintrayVersion = '0.5.3'
     bintrayGroup = 'com.gatebuzz'
     bintrayArtifact = 'rxrapidapi'
-    releaseTag = 'v_0_5_2'
-    releaseDescription = 'Internal restructuring'
+    releaseTag = 'v_0_5_3'
+    releaseDescription = 'Internal restructuring & default property values'
     bintrayUser = properties.getProperty('bintray.user.name')
     bintrayApiKey = properties.getProperty('bintray.api.key')
 
-    java7Jdk = properties.getProperty('old.jdk')
-
     rapidApiProject = properties.getProperty('rapidapi.project.name')
     rapidApiKey = properties.getProperty('rapidapi.api.key')
-    zillowApiKey = properties.getProperty('zillow.api.key')
 }

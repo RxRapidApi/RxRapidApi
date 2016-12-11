@@ -2,61 +2,18 @@ buildscript {
     repositories {
         jcenter()
     }
-
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.3'
-        classpath 'me.tatarka:gradle-retrolambda:3.3.0'
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
     }
 }
 
-apply plugin: 'com.android.application'
-apply plugin: 'me.tatarka.retrolambda'
-apply from: file("../build-scripts/properties.gradle")
-
-android {
-    compileSdkVersion 24
-    buildToolsVersion "24.0.3"
-    defaultConfig {
-        applicationId "com.gatebuzz.rapidapi.rx.example"
-        minSdkVersion 19
-        targetSdkVersion 24
-        versionCode 1
-        versionName "1.0"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-        buildConfigField "String", "PROJECT", "\"${rapidApiProject}\""
-        buildConfigField "String", "API_KEY", "\"${rapidApiKey}\""
-        buildConfigField "String", "ZILLOW_API_KEY", "\"${zillowApiKey}\""
-    }
-
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
-
-    lintOptions {
-        abortOnError false
-    }
-
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
+allprojects {
+    repositories {
+        jcenter()
     }
 }
 
-dependencies {
-    compile 'io.reactivex:rxandroid:1.2.1'
-
-    // Use this relative reference if you want to depend on the "live" development you
-    // are doing in the 'rxjava' module
-    //
-    // compile project(':rxjava')
-    //
-
-    // Use this jcenter reference to depend on the current production (stable) version
-    compile 'com.gatebuzz:rxrapidapi:0.5.2'
-
-    compile 'com.android.support:appcompat-v7:24.2.1'
-    compile 'com.android.support:design:24.2.1'
+task clean(type: Delete) {
+    delete rootProject.buildDir
 }

@@ -2,37 +2,51 @@ package com.gatebuzz.rapidapi.rx.internal;
 
 import com.gatebuzz.rapidapi.rx.ApiPackage;
 import com.gatebuzz.rapidapi.rx.Application;
+import com.gatebuzz.rapidapi.rx.DefaultValues;
 import com.gatebuzz.rapidapi.rx.Named;
 import com.gatebuzz.rapidapi.rx.UrlEncoded;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class CallConfiguration {
     public final String project;
     public final String key;
+    public final Map<String, String> classLevelDefaults;
+    public final Map<String, String> methodLevelDefaults;
+    public final List<String> defaultValueNames;
     final String pack;
     final String block;
     final List<String> parameters;
     final Set<String> urlEncoded;
 
-    CallConfiguration(String project, String key, String pack, String block, List<String> parameters, Set<String> urlEncoded) {
+    CallConfiguration(String project, String key, String pack, String block, List<String> parameters,
+                      Set<String> urlEncoded, Map<String, String> classLevelDefaults,
+                      Map<String, String> methodLevelDefaults, List<String> defaultValueNames) {
         this.project = project;
         this.key = key;
         this.pack = pack;
         this.block = block;
         this.parameters = parameters;
         this.urlEncoded = urlEncoded;
+        this.classLevelDefaults = classLevelDefaults;
+        this.methodLevelDefaults = methodLevelDefaults;
+        this.defaultValueNames = defaultValueNames;
     }
 
     public static CallConfiguration newInstance(
             Application classApplicationAnnotation, Application methodApplicationAnnotation,
             ApiPackage classApiPackageAnnotation, ApiPackage methodApiPackageAnnotation,
-            Method method, String project, String key, String apiPackage) {
+            Method method, String project, String key, String apiPackage,
+            Map<String, String> classLevelDefaults, Map<String, String> methodLevelDefaults,
+            DefaultValues classDefaultValueNamesAnnotation, DefaultValues methodDefaultValueNamesAnnotation) {
         String resolvedProject = fromAnnotation(Application::project,
                 project, methodApplicationAnnotation, classApplicationAnnotation,
                 "Project name not found (check the @Application annotation).");
@@ -55,9 +69,24 @@ public class CallConfiguration {
             throw new IllegalArgumentException("Incorrect number of @Named parameters on " + method.getName() + "() - expecting " + method.getParameterTypes().length + ", found " + parameters.size() + ".");
         }
 
+        List<String> defaultValueNames = collectDefaultValueNames(classDefaultValueNamesAnnotation, methodDefaultValueNamesAnnotation);
+
         Set<String> urlEncodedParameters = collectUrlEncodedParameters(method, parameters);
         return new CallConfiguration(resolvedProject, resolvedKey, resolvedApiPackage,
-                name.trim(), parameters, urlEncodedParameters);
+                name.trim(), parameters, urlEncodedParameters,
+                classLevelDefaults, methodLevelDefaults, defaultValueNames);
+    }
+
+    private static List<String> collectDefaultValueNames(DefaultValues classDefaultValueNamesAnnotation,
+                                                         DefaultValues methodDefaultValueNamesAnnotation) {
+        List<String> classDefaultValueNames = classDefaultValueNamesAnnotation != null ?
+                Arrays.asList(classDefaultValueNamesAnnotation.value()) : Collections.emptyList();
+        List<String> methodDefaultValueNames = methodDefaultValueNamesAnnotation != null ?
+                Arrays.asList(methodDefaultValueNamesAnnotation.value()) : Collections.emptyList();
+        List<String> defaultValueNames = new ArrayList<>();
+        defaultValueNames.addAll(classDefaultValueNames);
+        defaultValueNames.addAll(methodDefaultValueNames);
+        return defaultValueNames;
     }
 
     private static String collectRemoteMethodName(Method method) {
