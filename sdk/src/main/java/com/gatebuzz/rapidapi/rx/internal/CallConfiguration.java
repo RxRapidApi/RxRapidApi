@@ -2,7 +2,7 @@ package com.gatebuzz.rapidapi.rx.internal;
 
 import com.gatebuzz.rapidapi.rx.ApiPackage;
 import com.gatebuzz.rapidapi.rx.Application;
-import com.gatebuzz.rapidapi.rx.DefaultValues;
+import com.gatebuzz.rapidapi.rx.DefaultParameters;
 import com.gatebuzz.rapidapi.rx.Named;
 import com.gatebuzz.rapidapi.rx.UrlEncoded;
 
@@ -46,7 +46,7 @@ public class CallConfiguration {
             ApiPackage classApiPackageAnnotation, ApiPackage methodApiPackageAnnotation,
             Method method, String project, String key, String apiPackage,
             Map<String, String> classLevelDefaults, Map<String, String> methodLevelDefaults,
-            DefaultValues classDefaultValueNamesAnnotation, DefaultValues methodDefaultValueNamesAnnotation) {
+            DefaultParameters classDefaultValueNamesAnnotation, DefaultParameters methodDefaultValueNamesAnnotation) {
         String resolvedProject = fromAnnotation(Application::project,
                 project, methodApplicationAnnotation, classApplicationAnnotation,
                 "Project name not found (check the @Application annotation).");
@@ -77,8 +77,8 @@ public class CallConfiguration {
                 classLevelDefaults, methodLevelDefaults, defaultValueNames);
     }
 
-    private static List<String> collectDefaultValueNames(DefaultValues classDefaultValueNamesAnnotation,
-                                                         DefaultValues methodDefaultValueNamesAnnotation) {
+    private static List<String> collectDefaultValueNames(DefaultParameters classDefaultValueNamesAnnotation,
+                                                         DefaultParameters methodDefaultValueNamesAnnotation) {
         List<String> classDefaultValueNames = classDefaultValueNamesAnnotation != null ?
                 Arrays.asList(classDefaultValueNamesAnnotation.value()) : Collections.emptyList();
         List<String> methodDefaultValueNames = methodDefaultValueNamesAnnotation != null ?

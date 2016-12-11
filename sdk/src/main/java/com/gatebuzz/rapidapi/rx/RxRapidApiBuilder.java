@@ -6,7 +6,6 @@ import com.gatebuzz.rapidapi.rx.internal.CallHandlerFactory;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -88,20 +87,20 @@ public class RxRapidApiBuilder {
     public <T> T build() {
         Application applicationAnnotation = interfaceClass.getAnnotation(Application.class);
         ApiPackage apiPackageAnnotation = interfaceClass.getAnnotation(ApiPackage.class);
-        DefaultValues defaultValuesAnnotation = interfaceClass.getAnnotation(DefaultValues.class);
+        DefaultParameters defaultParametersAnnotation = interfaceClass.getAnnotation(DefaultParameters.class);
 
         Map<String, CallConfiguration> callConfigurationMap = new HashMap<>();
         for (Method method : interfaceClass.getMethods()) {
             Application methodAppAnnotation = method.getAnnotation(Application.class);
             ApiPackage methodApiPackageAnnotation = method.getAnnotation(ApiPackage.class);
-            DefaultValues methodDefaultValuesAnnotation = method.getAnnotation(DefaultValues.class);
+            DefaultParameters methodDefaultParametersAnnotation = method.getAnnotation(DefaultParameters.class);
 
             CallConfiguration configuration = CallConfiguration.newInstance(
                     applicationAnnotation, methodAppAnnotation,
                     apiPackageAnnotation, methodApiPackageAnnotation,
                     method, project, key, apiPackage, classLevelDefaults,
                     methodLevelDefaults.get(method.getName()),
-                    defaultValuesAnnotation, methodDefaultValuesAnnotation);
+                    defaultParametersAnnotation, methodDefaultParametersAnnotation);
             callConfigurationMap.put(method.getName(), configuration);
         }
 

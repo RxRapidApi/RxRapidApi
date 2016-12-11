@@ -386,7 +386,7 @@ public class RxRapidApiBuilderTest {
 
     //region Builder interfaces
     @Application(project = "a", key = "b")
-    @DefaultValues("key")
+    @DefaultParameters("key")
     private interface SingleClassLevelDefaultBuilderTestClass {
         @ApiPackage("c")
         Observable<Map<String, Object>> someMethod();
@@ -395,12 +395,12 @@ public class RxRapidApiBuilderTest {
     @Application(project = "a", key = "b")
     private interface SingleMethodLevelDefaultBuilderTestClass {
         @ApiPackage("c")
-        @DefaultValues("key")
+        @DefaultParameters("key")
         Observable<Map<String, Object>> someMethod();
     }
 
     @Application(project = "a", key = "b")
-    @DefaultValues({"key1", "key2"})
+    @DefaultParameters({"key1", "key2"})
     private interface MultipleClassLevelDefaultBuilderTestClass {
         @ApiPackage("c")
         Observable<Map<String, Object>> someMethod();
@@ -409,18 +409,18 @@ public class RxRapidApiBuilderTest {
     @Application(project = "a", key = "b")
     private interface MultipleMethodLevelDefaultBuilderTestClass {
         @ApiPackage("c")
-        @DefaultValues({"key1", "key2"})
+        @DefaultParameters({"key1", "key2"})
         Observable<Map<String, Object>> someMethod();
     }
 
     @Application(project = "a", key = "b")
-    @DefaultValues({"key1", "key2"})
+    @DefaultParameters({"key1", "key2"})
     @ApiPackage("c")
     private interface MultipleDefaultNamesBuilderTestClass {
-        @DefaultValues({"key3", "key4"})
+        @DefaultParameters({"key3", "key4"})
         Observable<Map<String, Object>> someMethod();
 
-        @DefaultValues("key5")
+        @DefaultParameters("key5")
         Observable<Map<String, Object>> someOtherMethod();
     }
     //endregion

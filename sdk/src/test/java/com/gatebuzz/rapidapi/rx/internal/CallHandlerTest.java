@@ -57,11 +57,7 @@ public class CallHandlerTest {
 
     @Test
     public void defaultParametersConfiguredFromClassLevelValues() throws Throwable {
-        Map<String, String> classLevelDefaults = new HashMap<String, String>(){{
-            put("key1", "value1");
-            put("key2", "value2");
-            put("key3", "value3");
-        }};
+        Map<String, String> classLevelDefaults = createDefaultValues();
 
         CallConfiguration configuration = new CallConfiguration("a", "b", "c", "someMethod",
                 Arrays.asList("first", "second"), new HashSet<>(),
@@ -87,11 +83,7 @@ public class CallHandlerTest {
 
     @Test
     public void methodLevelDefaultValues() throws Throwable {
-        Map<String, String> defaults = new HashMap<String, String>(){{
-            put("key1", "value1");
-            put("key2", "value2");
-            put("key3", "value3");
-        }};
+        Map<String, String> defaults = createDefaultValues();
 
         CallConfiguration configuration = new CallConfiguration("a", "b", "c", "someMethod",
                 Arrays.asList("first", "second"), new HashSet<>(),
@@ -145,6 +137,14 @@ public class CallHandlerTest {
         assertEquals("m_value1", args.getValue().get("key1").second);
         assertEquals("data", args.getValue().get("key2").first);
         assertEquals("value2", args.getValue().get("key2").second);
+    }
+
+    private Map<String, String> createDefaultValues() {
+        return new HashMap<String, String>(){{
+            put("key1", "value1");
+            put("key2", "value2");
+            put("key3", "value3");
+        }};
     }
 
     @Application(project = "a", key = "b")
