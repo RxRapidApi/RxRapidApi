@@ -3,22 +3,15 @@ package com.gatebuzz.rapidapi.rx.internal;
 import com.gatebuzz.rapidapi.rx.FailedCallException;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import okhttp3.*;
+import rx.Observable;
+import rx.Subscriber;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-
-import okhttp3.Credentials;
-import okhttp3.MediaType;
-import okhttp3.MultipartBody;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
-import rx.Observable;
-import rx.Subscriber;
 
 class Engine implements Observable.OnSubscribe<Map<String, Object>> {
     private static final String URL_FORMAT = "https://rapidapi.io/connect/%1$s/%2$s";

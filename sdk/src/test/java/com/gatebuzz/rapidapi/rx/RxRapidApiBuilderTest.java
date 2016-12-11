@@ -2,26 +2,21 @@ package com.gatebuzz.rapidapi.rx;
 
 import com.gatebuzz.rapidapi.rx.internal.CallConfiguration;
 import com.gatebuzz.rapidapi.rx.internal.CallHandlerFactory;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import rx.Observable;
+import rx.Single;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import rx.Observable;
-import rx.Single;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 
@@ -29,8 +24,10 @@ import static org.mockito.Mockito.verify;
 @RunWith(MockitoJUnitRunner.class)
 public class RxRapidApiBuilderTest {
 
-    @Mock private CallHandlerFactory callHandlerFactory;
-    @Captor private ArgumentCaptor<Map<String, CallConfiguration>> captor;
+    @Mock
+    private CallHandlerFactory callHandlerFactory;
+    @Captor
+    private ArgumentCaptor<Map<String, CallConfiguration>> captor;
 
     //region Builder methods
     @Test
@@ -116,7 +113,7 @@ public class RxRapidApiBuilderTest {
                 .defaultValue("key", "value")
                 .build();
 
-        verify(callHandlerFactory).create(eq(SingleClassLevelDefaultBuilderTestClass.class), captor.capture());
+        verify(callHandlerFactory).newInstance(eq(SingleClassLevelDefaultBuilderTestClass.class), captor.capture());
         Map<String, CallConfiguration> configMap = captor.getValue();
         assertEquals(1, configMap.size());
 
@@ -135,7 +132,7 @@ public class RxRapidApiBuilderTest {
                 .defaultValue("key2", "value2")
                 .build();
 
-        verify(callHandlerFactory).create(eq(SingleClassLevelDefaultBuilderTestClass.class), captor.capture());
+        verify(callHandlerFactory).newInstance(eq(SingleClassLevelDefaultBuilderTestClass.class), captor.capture());
         Map<String, CallConfiguration> configMap = captor.getValue();
         assertEquals(1, configMap.size());
 
@@ -157,7 +154,7 @@ public class RxRapidApiBuilderTest {
                 }})
                 .build();
 
-        verify(callHandlerFactory).create(eq(SingleClassLevelDefaultBuilderTestClass.class), captor.capture());
+        verify(callHandlerFactory).newInstance(eq(SingleClassLevelDefaultBuilderTestClass.class), captor.capture());
         Map<String, CallConfiguration> configMap = captor.getValue();
         assertEquals(1, configMap.size());
 
@@ -180,7 +177,7 @@ public class RxRapidApiBuilderTest {
                 .defaultValue("key3", "value3")
                 .build();
 
-        verify(callHandlerFactory).create(eq(SingleClassLevelDefaultBuilderTestClass.class), captor.capture());
+        verify(callHandlerFactory).newInstance(eq(SingleClassLevelDefaultBuilderTestClass.class), captor.capture());
         Map<String, CallConfiguration> configMap = captor.getValue();
         assertEquals(1, configMap.size());
 
@@ -200,7 +197,7 @@ public class RxRapidApiBuilderTest {
                 .defaultValue("someMethod", "key", "value")
                 .build();
 
-        verify(callHandlerFactory).create(eq(SingleClassLevelDefaultBuilderTestClass.class), captor.capture());
+        verify(callHandlerFactory).newInstance(eq(SingleClassLevelDefaultBuilderTestClass.class), captor.capture());
         CallConfiguration config = captor.getValue().get("someMethod");
         assertEquals(1, config.methodLevelDefaults.size());
         assertEquals("value", config.methodLevelDefaults.get("key"));
@@ -216,7 +213,7 @@ public class RxRapidApiBuilderTest {
                 }})
                 .build();
 
-        verify(callHandlerFactory).create(eq(SingleClassLevelDefaultBuilderTestClass.class), captor.capture());
+        verify(callHandlerFactory).newInstance(eq(SingleClassLevelDefaultBuilderTestClass.class), captor.capture());
         CallConfiguration config = captor.getValue().get("someMethod");
         assertEquals(2, config.methodLevelDefaults.size());
         assertEquals("value1", config.methodLevelDefaults.get("key1"));
@@ -234,7 +231,7 @@ public class RxRapidApiBuilderTest {
                 .defaultValue("someMethod", "key3", "value3")
                 .build();
 
-        verify(callHandlerFactory).create(eq(SingleClassLevelDefaultBuilderTestClass.class), captor.capture());
+        verify(callHandlerFactory).newInstance(eq(SingleClassLevelDefaultBuilderTestClass.class), captor.capture());
         CallConfiguration config = captor.getValue().get("someMethod");
         assertEquals(3, config.methodLevelDefaults.size());
         assertEquals("value1", config.methodLevelDefaults.get("key1"));
@@ -247,7 +244,7 @@ public class RxRapidApiBuilderTest {
         new RxRapidApiBuilder(callHandlerFactory)
                 .endpoint(SingleClassLevelDefaultBuilderTestClass.class)
                 .build();
-        verify(callHandlerFactory).create(eq(SingleClassLevelDefaultBuilderTestClass.class), captor.capture());
+        verify(callHandlerFactory).newInstance(eq(SingleClassLevelDefaultBuilderTestClass.class), captor.capture());
         CallConfiguration config = captor.getValue().get("someMethod");
         assertEquals(Collections.singletonList("key"), config.defaultValueNames);
     }
@@ -257,7 +254,7 @@ public class RxRapidApiBuilderTest {
         new RxRapidApiBuilder(callHandlerFactory)
                 .endpoint(MultipleClassLevelDefaultBuilderTestClass.class)
                 .build();
-        verify(callHandlerFactory).create(eq(MultipleClassLevelDefaultBuilderTestClass.class), captor.capture());
+        verify(callHandlerFactory).newInstance(eq(MultipleClassLevelDefaultBuilderTestClass.class), captor.capture());
         CallConfiguration config = captor.getValue().get("someMethod");
         assertEquals(Arrays.asList("key1", "key2"), config.defaultValueNames);
     }
@@ -267,7 +264,7 @@ public class RxRapidApiBuilderTest {
         new RxRapidApiBuilder(callHandlerFactory)
                 .endpoint(SingleMethodLevelDefaultBuilderTestClass.class)
                 .build();
-        verify(callHandlerFactory).create(eq(SingleMethodLevelDefaultBuilderTestClass.class), captor.capture());
+        verify(callHandlerFactory).newInstance(eq(SingleMethodLevelDefaultBuilderTestClass.class), captor.capture());
         CallConfiguration config = captor.getValue().get("someMethod");
         assertEquals(Collections.singletonList("key"), config.defaultValueNames);
     }
@@ -277,7 +274,7 @@ public class RxRapidApiBuilderTest {
         new RxRapidApiBuilder(callHandlerFactory)
                 .endpoint(MultipleMethodLevelDefaultBuilderTestClass.class)
                 .build();
-        verify(callHandlerFactory).create(eq(MultipleMethodLevelDefaultBuilderTestClass.class), captor.capture());
+        verify(callHandlerFactory).newInstance(eq(MultipleMethodLevelDefaultBuilderTestClass.class), captor.capture());
         CallConfiguration config = captor.getValue().get("someMethod");
         assertEquals(Arrays.asList("key1", "key2"), config.defaultValueNames);
     }
@@ -287,7 +284,7 @@ public class RxRapidApiBuilderTest {
         new RxRapidApiBuilder(callHandlerFactory)
                 .endpoint(MultipleDefaultNamesBuilderTestClass.class)
                 .build();
-        verify(callHandlerFactory).create(eq(MultipleDefaultNamesBuilderTestClass.class), captor.capture());
+        verify(callHandlerFactory).newInstance(eq(MultipleDefaultNamesBuilderTestClass.class), captor.capture());
         assertEquals(Arrays.asList("key1", "key2", "key3", "key4"), captor.getValue().get("someMethod").defaultValueNames);
         assertEquals(Arrays.asList("key1", "key2", "key5"), captor.getValue().get("someOtherMethod").defaultValueNames);
     }
@@ -378,7 +375,7 @@ public class RxRapidApiBuilderTest {
     public void annotationOnClass() {
         try {
             new RxRapidApiBuilder().endpoint(ApiPackageOnClass.class).build();
-        } catch(Exception e) {
+        } catch (Exception e) {
             fail("No exception expected");
         }
     }

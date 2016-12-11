@@ -1,11 +1,11 @@
 package com.gatebuzz.rapidapi.rx.internal;
 
+import rx.Observable;
+
 import java.lang.reflect.Method;
 import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
-
-import rx.Observable;
 
 public class CallHandler implements java.lang.reflect.InvocationHandler {
     private final Map<String, CallConfiguration> callConfigurationMap;
@@ -44,18 +44,18 @@ public class CallHandler implements java.lang.reflect.InvocationHandler {
             }
         }
 
-        Observable<Map<String, Object>> observable = Observable.create(engineYard.create(configuration, body));
+        Observable<Map<String, Object>> observable = Observable.create(engineYard.newInstance(configuration, body));
 
         return "Single".equals(method.getReturnType().getSimpleName()) ? observable.toSingle() : observable;
     }
 
     interface EngineYard {
-        Engine create(CallConfiguration configuration, Map<String, Pair<String, String>> body);
+        Engine newInstance(CallConfiguration configuration, Map<String, Pair<String, String>> body);
     }
 
     private static class DefaultEngineYard implements EngineYard {
         @Override
-        public Engine create(CallConfiguration configuration, Map<String, Pair<String, String>> body) {
+        public Engine newInstance(CallConfiguration configuration, Map<String, Pair<String, String>> body) {
             return new Engine(configuration, body);
         }
     }

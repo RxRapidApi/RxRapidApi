@@ -1,10 +1,9 @@
 package com.gatebuzz.rapidapi.rx;
 
 import org.junit.Test;
+import rx.Observable;
 
 import java.util.Map;
-
-import rx.Observable;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -44,7 +43,7 @@ public class ApiPackageNamingTest {
     public void annotationOnClass() {
         try {
             RxRapidApiBuilder.from(ApiPackageOnClass.class);
-        } catch(Exception e) {
+        } catch (Exception e) {
             fail("No exception expected");
         }
     }

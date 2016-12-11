@@ -1,6 +1,6 @@
 package com.gatebuzz.rapidapi.rx.internal;
 
-public class Pair<A,B> {
+public class Pair<A, B> {
     public final A first;
     public final B second;
 

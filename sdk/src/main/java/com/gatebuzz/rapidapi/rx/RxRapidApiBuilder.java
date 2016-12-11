@@ -1,6 +1,7 @@
 package com.gatebuzz.rapidapi.rx;
 
 import com.gatebuzz.rapidapi.rx.internal.CallConfiguration;
+import com.gatebuzz.rapidapi.rx.internal.CallConfigurationFactory;
 import com.gatebuzz.rapidapi.rx.internal.CallHandler;
 import com.gatebuzz.rapidapi.rx.internal.CallHandlerFactory;
 
@@ -11,19 +12,19 @@ import java.util.Map;
 
 public class RxRapidApiBuilder {
 
-    protected CallHandlerFactory callHandlerFactory;
+    private final CallHandlerFactory callHandlerFactory;
+    private final Map<String, String> classLevelDefaults = new HashMap<>();
+    private final Map<String, Map<String, String>> methodLevelDefaults = new HashMap<>();
     private Class<?> interfaceClass;
     private String project;
     private String key;
     private String apiPackage;
-    private Map<String, String> classLevelDefaults = new HashMap<>();
-    private Map<String, Map<String, String>> methodLevelDefaults = new HashMap<>();
 
     public RxRapidApiBuilder() {
         this(new CallHandlerFactory() {
             @SuppressWarnings("unchecked")
             @Override
-            public <T> T create(Class<?> interfaceClass, Map<String, CallConfiguration> configurationMap) {
+            public <T> T newInstance(Class<?> interfaceClass, Map<String, CallConfiguration> configurationMap) {
                 return (T) Proxy.newProxyInstance(interfaceClass.getClassLoader(),
                         new Class[]{interfaceClass}, new CallHandler(configurationMap));
             }
@@ -95,7 +96,7 @@ public class RxRapidApiBuilder {
             ApiPackage methodApiPackageAnnotation = method.getAnnotation(ApiPackage.class);
             DefaultParameters methodDefaultParametersAnnotation = method.getAnnotation(DefaultParameters.class);
 
-            CallConfiguration configuration = CallConfiguration.newInstance(
+            CallConfiguration configuration = CallConfigurationFactory.newInstance(
                     applicationAnnotation, methodAppAnnotation,
                     apiPackageAnnotation, methodApiPackageAnnotation,
                     method, project, key, apiPackage, classLevelDefaults,
@@ -104,6 +105,6 @@ public class RxRapidApiBuilder {
             callConfigurationMap.put(method.getName(), configuration);
         }
 
-        return (T) callHandlerFactory.create(interfaceClass, callConfigurationMap);
+        return (T) callHandlerFactory.newInstance(interfaceClass, callConfigurationMap);
     }
 }
