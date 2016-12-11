@@ -29,3 +29,14 @@ dependencies {
 
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
+
+task(runRetrolambda, type: JavaExec) {
+    main = 'net.orfjackal.retrolambda.Main'
+    classpath = files('tools/retrolambda-2.3.0.jar')
+    jvmArgs = [
+            "-Dretrolambda.inputDir=build/classes",
+            "-Dretrolambda.classpath=build/classes/main"
+    ]
+}
+
+classes.dependsOn runRetrolambda
