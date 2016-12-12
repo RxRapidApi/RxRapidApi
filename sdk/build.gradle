@@ -34,7 +34,7 @@ task(runRetrolambda, type: JavaExec) {
     main = 'net.orfjackal.retrolambda.Main'
     classpath = files('tools/retrolambda-2.3.0.jar')
     jvmArgs = [
-            "-Dretrolambda.inputDir=build/classes",
+            "-Dretrolambda.inputDir=build/classes/main",
             "-Dretrolambda.classpath=build/classes/main"
     ]
 }
