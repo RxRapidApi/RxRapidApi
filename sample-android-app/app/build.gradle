@@ -29,7 +29,6 @@ def zillowApiKey = properties.getProperty('zillow.api.key')
 def rapidApiProject = properties.getProperty('rapidapi.project.name')
 def rapidApiKey = properties.getProperty('rapidapi.api.key')
 
-
 android {
     compileSdkVersion 24
     buildToolsVersion "24.0.3"

@@ -5,24 +5,24 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.View;
 
+import com.gatebuzz.rapidapi.rx.FailedCallException;
 import com.gatebuzz.rapidapi.rx.RxRapidApiBuilder;
 
 import java.util.Map;
 
-import rx.Single;
-import rx.SingleSubscriber;
+import rx.Observable;
+import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
 import static com.gatebuzz.rapidapi.rx.example.BuildConfig.API_KEY;
 import static com.gatebuzz.rapidapi.rx.example.BuildConfig.PROJECT;
+import static com.gatebuzz.rapidapi.rx.example.BuildConfig.ZILLOW_API_KEY;
 
 @SuppressWarnings("unused")
 public class MainActivity extends AppCompatActivity {
 
-    public static final String SPOTIFY_PUBLIC_API = "SpotifyPublicAPI";
     @SuppressWarnings("FieldCanBeLocal")
     private NasaApi nasaApi;
     @SuppressWarnings("FieldCanBeLocal")
@@ -39,8 +39,12 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        // Bare bones - no additional configuration needed
-        zillowApi = RxRapidApiBuilder.from(ZillowApi.class);
+        // Pass a default Zillow Web Service Id parameter to every method
+        zillowApi = new RxRapidApiBuilder()
+                .application(PROJECT, API_KEY)
+                .defaultValue("zwsId", ZILLOW_API_KEY)
+                .endpoint(ZillowApi.class)
+                .build();
 
         // ApiPackage at the class level to avoid noise
         nasaApi = new RxRapidApiBuilder()
@@ -50,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
         // ApiPackage specified by the builder
         spotifyApi = new RxRapidApiBuilder()
                 .endpoint(SpotifyApi.class)
-                .apiPackage(SPOTIFY_PUBLIC_API)
+                .apiPackage("SpotifyPublicAPI")
                 .build();
 
         // Builder supplied project/key for an interface that could be shared
@@ -64,19 +68,27 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void tryTheApi() {
-        Single<Map<String, Object>> foo = hackerNewsApi.getBestStories();
+        Observable<Map<String, Object>> foo = zillowApi.getDeepSearchResults("", "2039 Yale Avenue", "63143");
 
         foo.subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new SingleSubscriber<Map<String, Object>>() {
+                .subscribe(new Subscriber<Map<String, Object>>() {
                     @Override
-                    public void onSuccess(Map<String, Object> value) {
-                        Log.e("Example", "onSuccess - value = " + value);
+                    public void onCompleted() {
+
                     }
 
                     @Override
-                    public void onError(Throwable error) {
-                        Log.e("Example", "onError", error);
+                    public void onError(Throwable e) {
+                        Log.e("RxRapidApi", "Error calling service", e);
+                        if (e instanceof FailedCallException) {
+                            Log.e("RxRapidApi", "Error response:" + ((FailedCallException) e).getResponse());
+                        }
+                    }
+
+                    @Override
+                    public void onNext(Map<String, Object> result) {
+                        Log.e("RxRapidApi", "Service result:" + result);
                     }
                 });
     }
