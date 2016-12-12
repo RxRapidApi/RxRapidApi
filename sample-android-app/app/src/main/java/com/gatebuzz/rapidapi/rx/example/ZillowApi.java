@@ -1,7 +1,6 @@
 package com.gatebuzz.rapidapi.rx.example;
 
 import com.gatebuzz.rapidapi.rx.ApiPackage;
-import com.gatebuzz.rapidapi.rx.Application;
 import com.gatebuzz.rapidapi.rx.DefaultParameters;
 import com.gatebuzz.rapidapi.rx.Named;
 import com.gatebuzz.rapidapi.rx.UrlEncoded;
@@ -18,7 +17,6 @@ public interface ZillowApi {
             @Named("zpid") String propertyId,
             @Named("rentzestimate") String rentEstimate
     );
-
 
     Observable<Map<String, Object>> getSearchResults(
             @Named("rentzestimate") String rentEstimate,
