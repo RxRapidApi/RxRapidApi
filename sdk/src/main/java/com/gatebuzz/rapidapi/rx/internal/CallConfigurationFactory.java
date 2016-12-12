@@ -36,7 +36,12 @@ public class CallConfigurationFactory {
         }
 
         List<String> defaultValueNames = collectDefaultValueNames(classDefaultValueNamesAnnotation, methodDefaultValueNamesAnnotation);
-
+        if (classLevelDefaults == null) {
+            classLevelDefaults = Collections.emptyMap();
+        }
+        if (methodLevelDefaults == null) {
+            methodLevelDefaults = Collections.emptyMap();
+        }
         Set<String> urlEncodedParameters = collectUrlEncodedParameters(method, parameters);
         return new CallConfiguration(resolvedProject, resolvedKey, resolvedApiPackage,
                 name.trim(), parameters, urlEncodedParameters,
