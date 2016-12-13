@@ -1,0 +1,17 @@
+Properties properties = new Properties()
+if (project.rootProject.file('local.properties').exists()) {
+    properties.load(project.rootProject.file('local.properties').newDataInputStream())
+}
+
+ext {
+    bintrayVersion = '0.6.0'
+    bintrayGroup = 'com.gatebuzz'
+    bintrayArtifact = 'rxrapidapi'
+    releaseTag = 'v_0_6_0'
+    releaseDescription = 'Internal restructuring & default property values'
+    bintrayUser = properties.getProperty('bintray.user.name')
+    bintrayApiKey = properties.getProperty('bintray.api.key')
+
+    rapidApiProject = properties.getProperty('rapidapi.project.name')
+    rapidApiKey = properties.getProperty('rapidapi.api.key')
+}
