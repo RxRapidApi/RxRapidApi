@@ -14,7 +14,7 @@ or maven
 <dependency>
   <groupId>com.gatebuzz</groupId>
   <artifactId>rxrapidapi</artifactId>
-  <version>0.5.2</version>
+  <version>0.6.0</version>
   <type>pom</type>
 </dependency>
 ```
