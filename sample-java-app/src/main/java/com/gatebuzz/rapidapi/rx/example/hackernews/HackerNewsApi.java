@@ -1,4 +1,4 @@
-package com.gatebuzz.rapidapi.rx.example;
+package com.gatebuzz.rapidapi.rx.example.hackernews;
 
 import com.gatebuzz.rapidapi.rx.ApiPackage;
 import com.gatebuzz.rapidapi.rx.Application;
