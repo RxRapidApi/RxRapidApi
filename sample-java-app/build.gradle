@@ -5,14 +5,9 @@ repositories {
     jcenter()
 }
 
-mainClassName = 'com.gatebuzz.rapidapi.rx.example.ExampleApp'
-
-sourceCompatibility = JavaVersion.VERSION_1_8
-targetCompatibility = JavaVersion.VERSION_1_8
-
 dependencies {
     // Depend on production version - other dependencies will be downloaded
-    // compile 'com.gatebuzz:rxrapidapi:0.5.2'
+    // compile 'com.gatebuzz:rxrapidapi:0.7.0'
 
     // Depend on local development version
     compile files('../sdk/build/libs/RxRapidApiSdk.jar')
@@ -24,3 +19,13 @@ dependencies {
     compile 'io.reactivex:rxjavafx:0.3.0'
 }
 
+Properties properties = new Properties()
+if (project.rootProject.file('local.properties').exists()) {
+    properties.load(project.rootProject.file('local.properties').newDataInputStream())
+}
+
+mainClassName = 'com.gatebuzz.rapidapi.rx.example.ExampleApp'
+applicationDefaultJvmArgs = ["-Dslack.api.key=${properties.get('slack.api.key')}"]
+
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
