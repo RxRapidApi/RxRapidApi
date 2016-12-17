@@ -81,12 +81,9 @@ public class ExampleApp extends Application {
         fileChooser.setTitle("Open Upload File");
         File file = fileChooser.showOpenDialog(primaryStage);
         if (file != null) {
-            slackApi.uploadFile(file, null, file.getName(), null, null, null)
-                    .subscribeOn(Schedulers.newThread())
-                    .map(r -> (String) r.get("success"))
-                    .map(this::slackFileResponse)
-                    .doOnNext(System.out::println)
-                    .subscribe();
+slackApi.getChannelHistory(null,null,null,null,null, null)
+        .doOnNext(System.out::println)
+        .subscribe();
         }
     }
 

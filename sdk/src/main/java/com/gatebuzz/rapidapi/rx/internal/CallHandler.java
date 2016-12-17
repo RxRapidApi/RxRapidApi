@@ -37,7 +37,7 @@ public class CallHandler implements java.lang.reflect.InvocationHandler {
                 putBody(configuration, body, parameter, parameterValues[i]);
             } else {
                 if (configuration.required != null && configuration.required.contains(parameter)) {
-                    throw new IllegalArgumentException("Calling \""+method.getName()+"\" - required paramter \""+parameter+"\" is null.");
+                    throw new IllegalArgumentException("Calling \""+method.getName()+"\" - required parameter \""+parameter+"\" is null.");
                 }
             }
         }
