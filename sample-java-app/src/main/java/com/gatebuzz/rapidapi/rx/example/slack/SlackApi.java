@@ -469,7 +469,7 @@ public interface SlackApi {
 
     Observable<Map<String, Object>> getUserGroups(
             @Named("includeDisabled") String includeDisabled,
-            @Named("includeСount") String includeСount,
+            @Named("includeCount") String includeCount,
             @Named("includeUsers") String includeUsers
     );
 

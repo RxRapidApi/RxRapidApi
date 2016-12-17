@@ -19,6 +19,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import rx.Observable;
+import rx.functions.Func1;
 import rx.schedulers.JavaFxScheduler;
 import rx.schedulers.Schedulers;
 
@@ -82,16 +83,12 @@ public class ExampleApp extends Application {
         File file = fileChooser.showOpenDialog(primaryStage);
         if (file != null) {
             slackApi.uploadFile(file, null, file.getName(), null, null, null)
-                    .subscribeOn(Schedulers.newThread())
-                    .map(r -> (String) r.get("success"))
-                    .map(this::slackFileResponse)
+                    .map(result -> (String)result.get("success"))
+                    .map(SlackFileResponse::fromJson)
+                    .map(sfr -> sfr.file)
                     .doOnNext(System.out::println)
                     .subscribe();
         }
-    }
-
-    private SlackFileResponse slackFileResponse(String serverResponse) {
-        return gson.fromJson(serverResponse, SlackFileResponse.class);
     }
 
     public static void main(String[] args) {
