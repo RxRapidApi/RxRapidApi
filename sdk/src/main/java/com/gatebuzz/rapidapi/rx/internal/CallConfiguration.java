@@ -14,16 +14,19 @@ public class CallConfiguration {
     final String block;
     final List<String> parameters;
     final Set<String> urlEncoded;
+    final Set<String> required;
 
     CallConfiguration(String project, String key, String pack, String block, List<String> parameters,
-                      Set<String> urlEncoded, Map<String, String> classLevelDefaults,
-                      Map<String, String> methodLevelDefaults, List<String> defaultValueNames) {
+                      Set<String> urlEncoded, Set<String> required,
+                      Map<String, String> classLevelDefaults, Map<String, String> methodLevelDefaults,
+                      List<String> defaultValueNames) {
         this.project = project;
         this.key = key;
         this.pack = pack;
         this.block = block;
         this.parameters = parameters;
         this.urlEncoded = urlEncoded;
+        this.required = required;
         this.classLevelDefaults = classLevelDefaults;
         this.methodLevelDefaults = methodLevelDefaults;
         this.defaultValueNames = defaultValueNames;

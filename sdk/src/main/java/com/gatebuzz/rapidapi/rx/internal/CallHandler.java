@@ -33,7 +33,13 @@ public class CallHandler implements java.lang.reflect.InvocationHandler {
 
         for (int i = 0; i < configuration.parameters.size(); i++) {
             String parameter = configuration.parameters.get(i);
-            putBody(configuration, body, parameter, parameterValues[i]);
+            if (parameterValues[i] != null) {
+                putBody(configuration, body, parameter, parameterValues[i]);
+            } else {
+                if (configuration.required != null && configuration.required.contains(parameter)) {
+                    throw new IllegalArgumentException("Calling \""+method.getName()+"\" - required paramter \""+parameter+"\" is null.");
+                }
+            }
         }
 
         if (configuration.defaultValueNames != null) {

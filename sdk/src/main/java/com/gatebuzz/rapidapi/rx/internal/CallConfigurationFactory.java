@@ -42,9 +42,10 @@ public class CallConfigurationFactory {
         if (methodLevelDefaults == null) {
             methodLevelDefaults = Collections.emptyMap();
         }
-        Set<String> urlEncodedParameters = collectUrlEncodedParameters(method, parameters);
+        Set<String> urlEncodedParameters = collectMarkerAnnotationsOnParameters(method, parameters, UrlEncoded.class);
+        Set<String> requiredParameters = collectMarkerAnnotationsOnParameters(method, parameters, Required.class);
         return new CallConfiguration(resolvedProject, resolvedKey, resolvedApiPackage,
-                name.trim(), parameters, urlEncodedParameters,
+                name.trim(), parameters, urlEncodedParameters, requiredParameters,
                 classLevelDefaults, methodLevelDefaults, defaultValueNames);
     }
 
@@ -78,13 +79,13 @@ public class CallConfigurationFactory {
         return parameters;
     }
 
-    private static Set<String> collectUrlEncodedParameters(Method method, List<String> names) {
+    private static Set<String> collectMarkerAnnotationsOnParameters(Method method, List<String> names, Class<? extends Annotation> markerAnnotation) {
         Set<String> parameters = new HashSet<>();
         Annotation[][] parameterAnnotations = method.getParameterAnnotations();
         for (int i = 0; i < parameterAnnotations.length; i++) {
             Annotation[] annotations = parameterAnnotations[i];
             for (Annotation annotation : annotations) {
-                if (annotation.annotationType().equals(UrlEncoded.class)) {
+                if (annotation.annotationType().equals(markerAnnotation)) {
                     parameters.add(names.get(i));
                 }
             }
