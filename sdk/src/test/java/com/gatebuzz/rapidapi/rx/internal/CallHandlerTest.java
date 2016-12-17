@@ -14,12 +14,14 @@ import rx.Observable;
 import java.util.*;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.fail;
 import static org.mockito.Matchers.isA;
 import static org.mockito.Matchers.same;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"unchecked", "Duplicates"})
 @RunWith(MockitoJUnitRunner.class)
 public class CallHandlerTest {
 
@@ -33,8 +35,8 @@ public class CallHandlerTest {
     @Test
     public void engineConfiguredAsExpected() throws Throwable {
         CallConfiguration configuration = new CallConfiguration("a", "b", "c", "someMethod",
-                Arrays.asList("first", "second"), new HashSet<>(),
-                Collections.emptyMap(), Collections.emptyMap(), Collections.emptyList());
+                Arrays.asList("first", "second"), new HashSet<>(), new HashSet<>(), Collections.emptyMap(),
+                Collections.emptyMap(), Collections.emptyList());
         String expectedFirstParam = "d";
         String expectedSecondParam = "e";
 
@@ -53,11 +55,50 @@ public class CallHandlerTest {
     }
 
     @Test
+    public void optionalNullValuesAreSkipped() throws Throwable {
+        CallConfiguration configuration = new CallConfiguration("a", "b", "c", "someMethod",
+                Arrays.asList("first", "second"), new HashSet<>(), new HashSet<>(), Collections.emptyMap(),
+                Collections.emptyMap(), Collections.emptyList());
+
+        when(engineYard.newInstance(isA(CallConfiguration.class), isA(Map.class))).thenReturn(engine);
+        Map<String, CallConfiguration> config = new HashMap<>();
+        config.put("someMethod", configuration);
+        CallHandler handler = new CallHandler(config, engineYard);
+        handler.invoke(null, SomeInterface.class.getMethod("someMethod", String.class, String.class),
+                new Object[]{null, "present"});
+
+        verify(engineYard).newInstance(same(configuration), args.capture());
+        assertFalse(args.getValue().containsKey("first"));
+        assertEquals("data", args.getValue().get("second").first);
+        assertEquals("present", args.getValue().get("second").second);
+    }
+    @Test
+    public void requiredNullValuesThrowException() throws Throwable {
+        HashSet<String> required = new HashSet<>();
+        required.add("first");
+        CallConfiguration configuration = new CallConfiguration("a", "b", "c", "someMethod",
+                Arrays.asList("first", "second"), new HashSet<>(), required, Collections.emptyMap(),
+                Collections.emptyMap(), Collections.emptyList());
+
+        when(engineYard.newInstance(isA(CallConfiguration.class), isA(Map.class))).thenReturn(engine);
+        Map<String, CallConfiguration> config = new HashMap<>();
+        config.put("someMethod", configuration);
+        CallHandler handler = new CallHandler(config, engineYard);
+        try {
+            handler.invoke(null, SomeInterface.class.getMethod("someMethod", String.class, String.class),
+                    new Object[]{null, "present"});
+            fail("Required (but null) parameter should thow exception");
+        } catch (IllegalArgumentException iar) {
+            assertEquals("Calling \"someMethod\" - required paramter \"first\" is null.", iar.getMessage());
+        }
+    }
+
+    @Test
     public void defaultParametersConfiguredFromClassLevelValues() throws Throwable {
         Map<String, String> classLevelDefaults = createDefaultValues();
 
         CallConfiguration configuration = new CallConfiguration("a", "b", "c", "someMethod",
-                Arrays.asList("first", "second"), new HashSet<>(),
+                Arrays.asList("first", "second"), new HashSet<>(), new HashSet<>(),
                 classLevelDefaults, Collections.emptyMap(), Arrays.asList("key1", "key2"));
 
         when(engineYard.newInstance(isA(CallConfiguration.class), isA(Map.class))).thenReturn(engine);
@@ -83,7 +124,7 @@ public class CallHandlerTest {
         Map<String, String> defaults = createDefaultValues();
 
         CallConfiguration configuration = new CallConfiguration("a", "b", "c", "someMethod",
-                Arrays.asList("first", "second"), new HashSet<>(),
+                Arrays.asList("first", "second"), new HashSet<>(), new HashSet<>(),
                 Collections.emptyMap(), defaults, Arrays.asList("key1", "key2"));
 
         when(engineYard.newInstance(isA(CallConfiguration.class), isA(Map.class))).thenReturn(engine);
@@ -115,7 +156,7 @@ public class CallHandlerTest {
         }};
 
         CallConfiguration configuration = new CallConfiguration("a", "b", "c", "someMethod",
-                Arrays.asList("first", "second"), new HashSet<>(),
+                Arrays.asList("first", "second"), new HashSet<>(),new HashSet<>(),
                 classDefaults, defaults, Arrays.asList("key1", "key2"));
 
         when(engineYard.newInstance(isA(CallConfiguration.class), isA(Map.class))).thenReturn(engine);
