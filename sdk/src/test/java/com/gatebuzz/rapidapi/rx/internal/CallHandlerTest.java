@@ -89,7 +89,7 @@ public class CallHandlerTest {
                     new Object[]{null, "present"});
             fail("Required (but null) parameter should thow exception");
         } catch (IllegalArgumentException iar) {
-            assertEquals("Calling \"someMethod\" - required paramter \"first\" is null.", iar.getMessage());
+            assertEquals("Calling \"someMethod\" - required parameter \"first\" is null.", iar.getMessage());
         }
     }
 

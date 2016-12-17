@@ -1,11 +1,16 @@
 package com.gatebuzz.rapidapi.rx.example.slack;
 
+import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.SerializedName;
 
 public class SlackFileResponse {
     public boolean ok;
     public SlackFile file;
+
+    public static SlackFileResponse fromJson(String json) {
+        return new Gson().fromJson(json, SlackFileResponse.class);
+    }
 
     public static class SlackFile {
         private String id;
