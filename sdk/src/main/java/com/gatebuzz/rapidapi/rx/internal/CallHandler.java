@@ -1,13 +1,13 @@
 package com.gatebuzz.rapidapi.rx.internal;
 
-import rx.Observable;
-
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
 import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
+
+import static com.gatebuzz.rapidapi.rx.internal.CallConfiguration.*;
 
 public class CallHandler implements java.lang.reflect.InvocationHandler {
     private static final String FILE = "file";
@@ -32,41 +32,43 @@ public class CallHandler implements java.lang.reflect.InvocationHandler {
         final Map<String, Pair<String, String>> body = new HashMap<>();
 
         for (int i = 0; i < configuration.parameters.size(); i++) {
-            String parameter = configuration.parameters.get(i);
+            Parameter parameter = configuration.parameters.get(i);
             if (parameterValues[i] != null) {
-                putBody(configuration, body, parameter, parameterValues[i]);
+                putBody(body, parameter, parameterValues[i]);
             } else {
-                if (configuration.required != null && configuration.required.contains(parameter)) {
-                    throw new IllegalArgumentException("Calling \""+method.getName()+"\" - required parameter \""+parameter+"\" is null.");
+                if (parameter.required) {
+                    throw new IllegalArgumentException("Calling \"" + method.getName() + "\" - required parameter \"" + parameter + "\" is null.");
                 }
             }
         }
 
-        if (configuration.defaultValueNames != null) {
-            for (String parameter : configuration.defaultValueNames) {
-                String methodValue = configuration.methodLevelDefaults.get(parameter);
-                String classValue = configuration.classLevelDefaults.get(parameter);
+        if (configuration.defaultParameters != null) {
+            for (Parameter parameter : configuration.defaultParameters) {
+                String methodValue = configuration.methodLevelDefaults.get(parameter.name);
+                String classValue = configuration.classLevelDefaults.get(parameter.name);
                 String value = methodValue != null ? methodValue : classValue != null ? classValue : null;
                 if (value != null) {
-                    putBody(configuration, body, parameter, value);
+                    putBody(body, parameter, value);
                 }
             }
         }
 
-        Observable<Map<String, Object>> observable = Observable.create(engineYard.newInstance(configuration, body));
-        return SINGLE.equals(method.getReturnType().getSimpleName()) ? observable.toSingle() : observable;
+        Engine engine = engineYard.newInstance(configuration, body);
+        return SINGLE.equals(method.getReturnType().getSimpleName()) ? engine.getSingle() : engine.getObservable();
     }
 
-    private void putBody(CallConfiguration configuration, Map<String, Pair<String, String>> body,
-                         String parameter, Object parameterValue) throws UnsupportedEncodingException {
+    private void putBody(Map<String, Pair<String, String>> body, Parameter parameter, Object parameterValue) {
         if (parameterValue instanceof File) {
-            body.put(parameter, new Pair<>(FILE, ((File) parameterValue).getAbsolutePath()));
+            body.put(parameter.name, new Pair<>(FILE, ((File) parameterValue).getAbsolutePath()));
         } else {
             String value = String.valueOf(parameterValue);
-            if (configuration.urlEncoded.contains(parameter)) {
-                value = URLEncoder.encode(value, UTF_8);
+            if (parameter.urlEncoded) {
+                try {
+                    value = URLEncoder.encode(value, UTF_8);
+                } catch (UnsupportedEncodingException ignored) {
+                }
             }
-            body.put(parameter, new Pair<>(DATA, value));
+            body.put(parameter.name, new Pair<>(DATA, value));
         }
     }
 

@@ -1,6 +1,7 @@
 package com.gatebuzz.rapidapi.rx;
 
 import com.gatebuzz.rapidapi.rx.internal.CallConfiguration;
+import com.gatebuzz.rapidapi.rx.internal.CallConfiguration.Parameter;
 import com.gatebuzz.rapidapi.rx.internal.CallHandlerFactory;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -110,6 +111,7 @@ public class RxRapidApiBuilderTest {
     public void singleClassLevelDefaultPassedThrough() {
         new RxRapidApiBuilder(callHandlerFactory)
                 .endpoint(SingleClassLevelDefaultBuilderTestClass.class)
+                .apiPackage("c")
                 .defaultValue("key", "value")
                 .build();
 
@@ -128,6 +130,7 @@ public class RxRapidApiBuilderTest {
     public void multipleClassLevelDefaults() {
         new RxRapidApiBuilder(callHandlerFactory)
                 .endpoint(SingleClassLevelDefaultBuilderTestClass.class)
+                .apiPackage("c")
                 .defaultValue("key1", "value1")
                 .defaultValue("key2", "value2")
                 .build();
@@ -148,6 +151,7 @@ public class RxRapidApiBuilderTest {
     public void multipleClassLevelDefaultsFromMap() {
         new RxRapidApiBuilder(callHandlerFactory)
                 .endpoint(SingleClassLevelDefaultBuilderTestClass.class)
+                .apiPackage("c")
                 .defaultValues(new HashMap<String, String>() {{
                     put("key1", "value1");
                     put("key2", "value2");
@@ -170,6 +174,7 @@ public class RxRapidApiBuilderTest {
     public void multipleClassLevelDefaultsFromMapAndSingleValues() {
         new RxRapidApiBuilder(callHandlerFactory)
                 .endpoint(SingleClassLevelDefaultBuilderTestClass.class)
+                .apiPackage("c")
                 .defaultValues(new HashMap<String, String>() {{
                     put("key1", "value1");
                     put("key2", "value2");
@@ -194,6 +199,7 @@ public class RxRapidApiBuilderTest {
     public void singleMethodLevelDefaultValue() {
         new RxRapidApiBuilder(callHandlerFactory)
                 .endpoint(SingleClassLevelDefaultBuilderTestClass.class)
+                .apiPackage("c")
                 .defaultValue("someMethod", "key", "value")
                 .build();
 
@@ -207,6 +213,7 @@ public class RxRapidApiBuilderTest {
     public void multipleMethodLevelDefaultsFromMap() {
         new RxRapidApiBuilder(callHandlerFactory)
                 .endpoint(SingleClassLevelDefaultBuilderTestClass.class)
+                .apiPackage("c")
                 .defaultValues("someMethod", new HashMap<String, String>() {{
                     put("key1", "value1");
                     put("key2", "value2");
@@ -224,6 +231,7 @@ public class RxRapidApiBuilderTest {
     public void multipleMethodLevelDefaultsFromMapAndSingleValues() {
         new RxRapidApiBuilder(callHandlerFactory)
                 .endpoint(SingleClassLevelDefaultBuilderTestClass.class)
+                .apiPackage("c")
                 .defaultValues("someMethod", new HashMap<String, String>() {{
                     put("key1", "value1");
                     put("key2", "value2");
@@ -243,10 +251,11 @@ public class RxRapidApiBuilderTest {
     public void classLevelDefaultValueNamesPassedDownToConfig() {
         new RxRapidApiBuilder(callHandlerFactory)
                 .endpoint(SingleClassLevelDefaultBuilderTestClass.class)
+                .apiPackage("c")
                 .build();
         verify(callHandlerFactory).newInstance(eq(SingleClassLevelDefaultBuilderTestClass.class), captor.capture());
         CallConfiguration config = captor.getValue().get("someMethod");
-        assertEquals(Collections.singletonList("key"), config.defaultValueNames);
+        assertEquals(Collections.singletonList(new Parameter("key")), config.defaultParameters);
     }
 
     @Test
@@ -256,7 +265,7 @@ public class RxRapidApiBuilderTest {
                 .build();
         verify(callHandlerFactory).newInstance(eq(MultipleClassLevelDefaultBuilderTestClass.class), captor.capture());
         CallConfiguration config = captor.getValue().get("someMethod");
-        assertEquals(Arrays.asList("key1", "key2"), config.defaultValueNames);
+        assertEquals(Arrays.asList(new Parameter("key1"), new Parameter("key2")), config.defaultParameters);
     }
 
     @Test
@@ -266,7 +275,7 @@ public class RxRapidApiBuilderTest {
                 .build();
         verify(callHandlerFactory).newInstance(eq(SingleMethodLevelDefaultBuilderTestClass.class), captor.capture());
         CallConfiguration config = captor.getValue().get("someMethod");
-        assertEquals(Collections.singletonList("key"), config.defaultValueNames);
+        assertEquals(Collections.singletonList(new Parameter("key")), config.defaultParameters);
     }
 
     @Test
@@ -276,7 +285,7 @@ public class RxRapidApiBuilderTest {
                 .build();
         verify(callHandlerFactory).newInstance(eq(MultipleMethodLevelDefaultBuilderTestClass.class), captor.capture());
         CallConfiguration config = captor.getValue().get("someMethod");
-        assertEquals(Arrays.asList("key1", "key2"), config.defaultValueNames);
+        assertEquals(Arrays.asList(new Parameter("key1"), new Parameter("key2")), config.defaultParameters);
     }
 
     @Test
@@ -285,8 +294,10 @@ public class RxRapidApiBuilderTest {
                 .endpoint(MultipleDefaultNamesBuilderTestClass.class)
                 .build();
         verify(callHandlerFactory).newInstance(eq(MultipleDefaultNamesBuilderTestClass.class), captor.capture());
-        assertEquals(Arrays.asList("key1", "key2", "key3", "key4"), captor.getValue().get("someMethod").defaultValueNames);
-        assertEquals(Arrays.asList("key1", "key2", "key5"), captor.getValue().get("someOtherMethod").defaultValueNames);
+        assertEquals(Arrays.asList(new Parameter("key1"), new Parameter("key2"),
+                new Parameter("key3"), new Parameter("key4")), captor.getValue().get("someMethod").defaultParameters);
+        assertEquals(Arrays.asList(new Parameter("key1"), new Parameter("key2"),
+                new Parameter("key5")), captor.getValue().get("someOtherMethod").defaultParameters);
     }
     //endregion
 
@@ -385,7 +396,6 @@ public class RxRapidApiBuilderTest {
     @Application(project = "a", key = "b")
     @DefaultParameters("key")
     private interface SingleClassLevelDefaultBuilderTestClass {
-        @ApiPackage("c")
         Observable<Map<String, Object>> someMethod();
     }
 
