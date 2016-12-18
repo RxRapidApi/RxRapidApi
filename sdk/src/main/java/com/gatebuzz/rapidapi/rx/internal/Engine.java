@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import okhttp3.*;
 import rx.Observable;
+import rx.Single;
 import rx.Subscriber;
 
 import java.io.File;
@@ -13,7 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-class Engine implements Observable.OnSubscribe<Map<String, Object>> {
+class Engine {
     private static final String URL_FORMAT = "https://rapidapi.io/connect/%1$s/%2$s";
     private static final RequestBody EMPTY = RequestBody.create(MediaType.parse("text/plain"), "");
 
@@ -29,8 +30,20 @@ class Engine implements Observable.OnSubscribe<Map<String, Object>> {
         this.gson = new Gson();
     }
 
-    @Override
-    public void call(Subscriber<? super Map<String, Object>> subscriber) {
+    Single<Map<String, Object>> getSingle() {
+        return getObservable().toSingle();
+    }
+
+    Observable<Map<String, Object>> getObservable() {
+        return Observable.create(new Observable.OnSubscribe<Map<String, Object>>() {
+            @Override
+            public void call(Subscriber<? super Map<String, Object>> subscriber) {
+                executeCall(subscriber);
+            }
+        });
+    }
+
+    private void executeCall(Subscriber<? super Map<String, Object>> subscriber) {
         try {
             RequestBody requestBody = createMultipartBody();
 
@@ -88,5 +101,4 @@ class Engine implements Observable.OnSubscribe<Map<String, Object>> {
         }
         return builder.build();
     }
-
 }

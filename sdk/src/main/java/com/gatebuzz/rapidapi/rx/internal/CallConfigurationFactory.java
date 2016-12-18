@@ -1,12 +1,16 @@
 package com.gatebuzz.rapidapi.rx.internal;
 
 import com.gatebuzz.rapidapi.rx.*;
+import com.gatebuzz.rapidapi.rx.internal.CallConfiguration.Parameter;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.*;
 
 public class CallConfigurationFactory {
+
+    public static final String[] EMPTY = new String[0];
+
     public static CallConfiguration newInstance(
             Application classApplicationAnnotation, Application methodApplicationAnnotation,
             ApiPackage classApiPackageAnnotation, ApiPackage methodApiPackageAnnotation,
@@ -23,42 +27,42 @@ public class CallConfigurationFactory {
 
         String resolvedApiPackage = fromAnnotation(ApiPackage::value,
                 apiPackage, methodApiPackageAnnotation, classApiPackageAnnotation,
-                "API package not found - check the @ApiPackage " + "annotation on the interface or on " + method.getName() + "().");
+                "API package not found - check the @ApiPackage annotation on the interface or on " + method.getName() + "().");
 
-        String name = collectRemoteMethodName(method);
-        if (name.trim().isEmpty()) {
-            throw new IllegalArgumentException("API method name not found on " + method.getName() + "() " + "(check the @Named annotation on your interface method).");
+        String name = collectRemoteMethodName(method).trim();
+        if (name.isEmpty()) {
+            throw new IllegalArgumentException("API method name not found on " +
+                    method.getName() + "() " + "(check the @Named annotation on your interface method).");
         }
 
-        List<String> parameters = collectParameterNames(method);
+        List<Parameter> parameters = collectAnnotatedParameters(method);
         if (parameters.size() != method.getParameterTypes().length) {
-            throw new IllegalArgumentException("Incorrect number of @Named parameters on " + method.getName() + "() - expecting " + method.getParameterTypes().length + ", found " + parameters.size() + ".");
+            throw new IllegalArgumentException("Incorrect number of @Named parameters on " +
+                    method.getName() + "() - expecting " + method.getParameterTypes().length +
+                    ", found " + parameters.size() + ".");
         }
 
-        List<String> defaultValueNames = collectDefaultValueNames(classDefaultValueNamesAnnotation, methodDefaultValueNamesAnnotation);
-        if (classLevelDefaults == null) {
-            classLevelDefaults = Collections.emptyMap();
-        }
-        if (methodLevelDefaults == null) {
-            methodLevelDefaults = Collections.emptyMap();
-        }
-        Set<String> urlEncodedParameters = collectMarkerAnnotationsOnParameters(method, parameters, UrlEncoded.class);
-        Set<String> requiredParameters = collectMarkerAnnotationsOnParameters(method, parameters, Required.class);
+        List<Parameter> defaultValueNames = collectDefaultValueNames(classDefaultValueNamesAnnotation, methodDefaultValueNamesAnnotation);
+
         return new CallConfiguration(resolvedProject, resolvedKey, resolvedApiPackage,
-                name.trim(), parameters, urlEncodedParameters, requiredParameters,
-                classLevelDefaults, methodLevelDefaults, defaultValueNames);
+                name, parameters, classLevelDefaults, methodLevelDefaults, defaultValueNames);
     }
 
-    private static List<String> collectDefaultValueNames(DefaultParameters classDefaultValueNamesAnnotation,
-                                                         DefaultParameters methodDefaultValueNamesAnnotation) {
-        List<String> classDefaultValueNames = classDefaultValueNamesAnnotation != null ?
-                Arrays.asList(classDefaultValueNamesAnnotation.value()) : Collections.emptyList();
-        List<String> methodDefaultValueNames = methodDefaultValueNamesAnnotation != null ?
-                Arrays.asList(methodDefaultValueNamesAnnotation.value()) : Collections.emptyList();
-        List<String> defaultValueNames = new ArrayList<>();
-        defaultValueNames.addAll(classDefaultValueNames);
-        defaultValueNames.addAll(methodDefaultValueNames);
+    private static List<Parameter> collectDefaultValueNames(DefaultParameters classDefaultValueNamesAnnotation,
+                                                            DefaultParameters methodDefaultValueNamesAnnotation) {
+        List<Parameter> defaultValueNames = new ArrayList<>();
+        defaultValueNames.addAll(getParameters(classDefaultValueNamesAnnotation));
+        defaultValueNames.addAll(getParameters(methodDefaultValueNamesAnnotation));
         return defaultValueNames;
+    }
+
+    private static List<Parameter> getParameters(DefaultParameters dp) {
+        String[] strings = dp != null ? dp.value() : EMPTY;
+        List<Parameter> list = new ArrayList<>();
+        for (String s : strings) {
+            list.add(new Parameter(s));
+        }
+        return list;
     }
 
     private static String collectRemoteMethodName(Method method) {
@@ -66,28 +70,23 @@ public class CallConfigurationFactory {
         return (methodNameAnnotation != null) ? methodNameAnnotation.value() : method.getName();
     }
 
-    private static List<String> collectParameterNames(Method method) {
+    private static List<Parameter> collectAnnotatedParameters(Method method) {
         Annotation[][] parameterAnnotations = method.getParameterAnnotations();
-        List<String> parameters = new ArrayList<>();
+        List<Parameter> parameters = new ArrayList<>();
         for (Annotation[] annotations : parameterAnnotations) {
+            Parameter p = new Parameter();
             for (Annotation annotation : annotations) {
-                if (annotation.annotationType().equals(Named.class)) {
-                    parameters.add(((Named) annotation).value().trim());
+                Class<? extends Annotation> annotationType = annotation.annotationType();
+                if (Named.class.equals(annotationType)) {
+                    p.name = ((Named) annotation).value();
+                } else if (UrlEncoded.class.equals(annotationType)) {
+                    p.urlEncoded = true;
+                } else if (Required.class.equals(annotationType)) {
+                    p.required = true;
                 }
             }
-        }
-        return parameters;
-    }
-
-    private static Set<String> collectMarkerAnnotationsOnParameters(Method method, List<String> names, Class<? extends Annotation> markerAnnotation) {
-        Set<String> parameters = new HashSet<>();
-        Annotation[][] parameterAnnotations = method.getParameterAnnotations();
-        for (int i = 0; i < parameterAnnotations.length; i++) {
-            Annotation[] annotations = parameterAnnotations[i];
-            for (Annotation annotation : annotations) {
-                if (annotation.annotationType().equals(markerAnnotation)) {
-                    parameters.add(names.get(i));
-                }
+            if (p.name != null) {
+                parameters.add(p);
             }
         }
         return parameters;

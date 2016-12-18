@@ -3,6 +3,8 @@ package com.gatebuzz.rapidapi.rx.internal;
 import com.gatebuzz.rapidapi.rx.ApiPackage;
 import com.gatebuzz.rapidapi.rx.Application;
 import com.gatebuzz.rapidapi.rx.Named;
+import com.gatebuzz.rapidapi.rx.internal.CallConfiguration.Parameter;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -13,6 +15,8 @@ import rx.Observable;
 
 import java.util.*;
 
+import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.fail;
@@ -32,11 +36,24 @@ public class CallHandlerTest {
     @Captor
     private ArgumentCaptor<Map<String, Pair<String, String>>> args;
 
+    private List<Parameter> params;
+    private List<Parameter> defaultParameters;
+    private Map<String, String> defaultValues;
+
+    @Before
+    public void setUp() throws Exception {
+        params = Arrays.asList(new Parameter("first"), new Parameter("second"));
+        defaultParameters = Arrays.asList(new Parameter("key1"), new Parameter("key2"));
+        defaultValues = new HashMap<String, String>() {{
+            put("key1", "value1");
+            put("key2", "value2");
+            put("key3", "value3");
+        }};
+    }
+
     @Test
     public void engineConfiguredAsExpected() throws Throwable {
-        CallConfiguration configuration = new CallConfiguration("a", "b", "c", "someMethod",
-                Arrays.asList("first", "second"), new HashSet<>(), new HashSet<>(), Collections.emptyMap(),
-                Collections.emptyMap(), Collections.emptyList());
+        CallConfiguration configuration = new CallConfiguration("a", "b", "c", "someMethod", params, emptyMap(), emptyMap(), emptyList());
         String expectedFirstParam = "d";
         String expectedSecondParam = "e";
 
@@ -56,9 +73,7 @@ public class CallHandlerTest {
 
     @Test
     public void optionalNullValuesAreSkipped() throws Throwable {
-        CallConfiguration configuration = new CallConfiguration("a", "b", "c", "someMethod",
-                Arrays.asList("first", "second"), new HashSet<>(), new HashSet<>(), Collections.emptyMap(),
-                Collections.emptyMap(), Collections.emptyList());
+        CallConfiguration configuration = new CallConfiguration("a", "b", "c", "someMethod", params, emptyMap(), emptyMap(), emptyList());
 
         when(engineYard.newInstance(isA(CallConfiguration.class), isA(Map.class))).thenReturn(engine);
         Map<String, CallConfiguration> config = new HashMap<>();
@@ -72,13 +87,11 @@ public class CallHandlerTest {
         assertEquals("data", args.getValue().get("second").first);
         assertEquals("present", args.getValue().get("second").second);
     }
+
     @Test
     public void requiredNullValuesThrowException() throws Throwable {
-        HashSet<String> required = new HashSet<>();
-        required.add("first");
-        CallConfiguration configuration = new CallConfiguration("a", "b", "c", "someMethod",
-                Arrays.asList("first", "second"), new HashSet<>(), required, Collections.emptyMap(),
-                Collections.emptyMap(), Collections.emptyList());
+        params.get(0).required = true;
+        CallConfiguration configuration = new CallConfiguration("a", "b", "c", "someMethod", params, emptyMap(), emptyMap(), emptyList());
 
         when(engineYard.newInstance(isA(CallConfiguration.class), isA(Map.class))).thenReturn(engine);
         Map<String, CallConfiguration> config = new HashMap<>();
@@ -87,7 +100,7 @@ public class CallHandlerTest {
         try {
             handler.invoke(null, SomeInterface.class.getMethod("someMethod", String.class, String.class),
                     new Object[]{null, "present"});
-            fail("Required (but null) parameter should thow exception");
+            fail("Required (but null) parameter should throw exception");
         } catch (IllegalArgumentException iar) {
             assertEquals("Calling \"someMethod\" - required parameter \"first\" is null.", iar.getMessage());
         }
@@ -95,11 +108,7 @@ public class CallHandlerTest {
 
     @Test
     public void defaultParametersConfiguredFromClassLevelValues() throws Throwable {
-        Map<String, String> classLevelDefaults = createDefaultValues();
-
-        CallConfiguration configuration = new CallConfiguration("a", "b", "c", "someMethod",
-                Arrays.asList("first", "second"), new HashSet<>(), new HashSet<>(),
-                classLevelDefaults, Collections.emptyMap(), Arrays.asList("key1", "key2"));
+        CallConfiguration configuration = new CallConfiguration("a", "b", "c", "someMethod", params, defaultValues, emptyMap(), defaultParameters);
 
         when(engineYard.newInstance(isA(CallConfiguration.class), isA(Map.class))).thenReturn(engine);
         Map<String, CallConfiguration> config = new HashMap<>();
@@ -121,11 +130,7 @@ public class CallHandlerTest {
 
     @Test
     public void methodLevelDefaultValues() throws Throwable {
-        Map<String, String> defaults = createDefaultValues();
-
-        CallConfiguration configuration = new CallConfiguration("a", "b", "c", "someMethod",
-                Arrays.asList("first", "second"), new HashSet<>(), new HashSet<>(),
-                Collections.emptyMap(), defaults, Arrays.asList("key1", "key2"));
+        CallConfiguration configuration = new CallConfiguration("a", "b", "c", "someMethod", params, emptyMap(), defaultValues, defaultParameters);
 
         when(engineYard.newInstance(isA(CallConfiguration.class), isA(Map.class))).thenReturn(engine);
         Map<String, CallConfiguration> config = new HashMap<>();
@@ -151,13 +156,11 @@ public class CallHandlerTest {
             put("key1", "value1");
             put("key2", "value2");
         }};
-        Map<String, String> defaults = new HashMap<String, String>() {{
+        Map<String, String> methodLevelDefaults = new HashMap<String, String>() {{
             put("key1", "m_value1");
         }};
 
-        CallConfiguration configuration = new CallConfiguration("a", "b", "c", "someMethod",
-                Arrays.asList("first", "second"), new HashSet<>(),new HashSet<>(),
-                classDefaults, defaults, Arrays.asList("key1", "key2"));
+        CallConfiguration configuration = new CallConfiguration("a", "b", "c", "someMethod", params, classDefaults, methodLevelDefaults, defaultParameters);
 
         when(engineYard.newInstance(isA(CallConfiguration.class), isA(Map.class))).thenReturn(engine);
         Map<String, CallConfiguration> config = new HashMap<>();
@@ -175,14 +178,6 @@ public class CallHandlerTest {
         assertEquals("m_value1", args.getValue().get("key1").second);
         assertEquals("data", args.getValue().get("key2").first);
         assertEquals("value2", args.getValue().get("key2").second);
-    }
-
-    private Map<String, String> createDefaultValues() {
-        return new HashMap<String, String>() {{
-            put("key1", "value1");
-            put("key2", "value2");
-            put("key3", "value3");
-        }};
     }
 
     @Application(project = "a", key = "b")
