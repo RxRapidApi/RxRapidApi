@@ -9,6 +9,7 @@ import okhttp3.OkHttpClient;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -195,12 +196,17 @@ public class RxRapidApiBuilder {
                     applicationAnnotation, methodAppAnnotation,
                     apiPackageAnnotation, methodApiPackageAnnotation,
                     method, project, key, apiPackage, classLevelDefaults,
-                    methodLevelDefaults.get(method.getName()),
+                    getMethodLevelDefaultsOrEmpty(method),
                     defaultParametersAnnotation, methodDefaultParametersAnnotation,
                     new CallConfiguration.Server(server, okHttpClient, gson));
             callConfigurationMap.put(method.getName(), configuration);
         }
 
         return callHandlerFactory.newInstance(interfaceClass, callConfigurationMap);
+    }
+
+    private Map<String, String> getMethodLevelDefaultsOrEmpty(Method method) {
+        Map<String, String> map = methodLevelDefaults.get(method.getName());
+        return map != null ? map : Collections.emptyMap();
     }
 }

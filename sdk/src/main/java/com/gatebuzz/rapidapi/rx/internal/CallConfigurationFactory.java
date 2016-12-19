@@ -19,7 +19,7 @@ public class CallConfigurationFactory {
             ApiPackage classApiPackageAnnotation, ApiPackage methodApiPackageAnnotation,
             Method method, String project, String key, String apiPackage,
             Map<String, String> classLevelDefaults, Map<String, String> methodLevelDefaults,
-            DefaultParameters classDefaultValueNamesAnnotation, DefaultParameters methodDefaultValueNamesAnnotation,
+            DefaultParameters classDefaults, DefaultParameters methodDefaults,
             Server server) {
         validateServer(server);
 
@@ -48,7 +48,7 @@ public class CallConfigurationFactory {
                     ", found " + parameters.size() + ".");
         }
 
-        List<Parameter> defaultValueNames = collectDefaultValueNames(classDefaultValueNamesAnnotation, methodDefaultValueNamesAnnotation);
+        List<Parameter> defaultValueNames = collectDefaultValueNames(classDefaults, methodDefaults);
 
         return new CallConfiguration(server, resolvedProject, resolvedKey, resolvedApiPackage,
                 name, parameters, classLevelDefaults, methodLevelDefaults, defaultValueNames);

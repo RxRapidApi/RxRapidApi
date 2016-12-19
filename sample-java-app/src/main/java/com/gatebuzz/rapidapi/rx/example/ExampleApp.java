@@ -18,6 +18,8 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
 import rx.Observable;
 import rx.functions.Func1;
 import rx.schedulers.JavaFxScheduler;
@@ -36,10 +38,18 @@ public class ExampleApp extends Application {
         this.primaryStage = primaryStage;
         hackerNewsApi = RxRapidApiBuilder.from(HackerNewsApi.class);
 
+        // Setup logging of requests + responses
+        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+        OkHttpClient client = new OkHttpClient.Builder()
+                .addInterceptor(logging)
+                .build();
+
         slackApi = new RxRapidApiBuilder()
                 .application("RxRapidApi_Demo", "e21f74d4-1cb0-4476-92fd-a81fb29d6fa0")
                 .endpoint(SlackApi.class)
                 .defaultValue("token", System.getProperty("slack.api.key"))
+                .okHttpClient(client)
                 .build();
 
         Button btn1 = new Button();
