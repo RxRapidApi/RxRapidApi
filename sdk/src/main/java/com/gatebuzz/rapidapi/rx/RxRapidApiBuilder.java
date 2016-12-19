@@ -4,6 +4,8 @@ import com.gatebuzz.rapidapi.rx.internal.CallConfiguration;
 import com.gatebuzz.rapidapi.rx.internal.CallConfigurationFactory;
 import com.gatebuzz.rapidapi.rx.internal.CallHandler;
 import com.gatebuzz.rapidapi.rx.internal.CallHandlerFactory;
+import com.google.gson.Gson;
+import okhttp3.OkHttpClient;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -16,6 +18,9 @@ public class RxRapidApiBuilder {
     private final CallHandlerFactory callHandlerFactory;
     private final Map<String, String> classLevelDefaults = new HashMap<>();
     private final Map<String, Map<String, String>> methodLevelDefaults = new HashMap<>();
+    private OkHttpClient okHttpClient;
+    private String server;
+    private Gson gson;
     private Class<?> interfaceClass;
     private String project;
     private String key;
@@ -33,6 +38,9 @@ public class RxRapidApiBuilder {
 
     RxRapidApiBuilder(CallHandlerFactory callHandlerFactory) {
         this.callHandlerFactory = callHandlerFactory;
+        this.server = "https://rapidapi.io/connect";
+        this.okHttpClient = new OkHttpClient();
+        this.gson = new Gson();
     }
 
     public static <I> I from(Class<I> interfaceClass) {
@@ -41,6 +49,36 @@ public class RxRapidApiBuilder {
 
     public RxRapidApiBuilder endpoint(Class<?> endpoint) {
         this.interfaceClass = endpoint;
+        return this;
+    }
+
+    /**
+     * Configure the server where Rapid API is deployed.
+     * @param server the server where Rapid API is deployed
+     * @return this builder
+     */
+    public RxRapidApiBuilder server(String server) {
+        this.server = server;
+        return this;
+    }
+
+    /**
+     * Configure the GSon parser used for service calls.
+     * @param gson the parser to use
+     * @return this builder
+     */
+    public RxRapidApiBuilder gson(Gson gson) {
+        this.gson = gson;
+        return this;
+    }
+
+    /**
+     * Configure the OkHttpClient used for service calls.
+     * @param okHttpClient the client to use
+     * @return this builder
+     */
+    public RxRapidApiBuilder okHttpClient(OkHttpClient okHttpClient) {
+        this.okHttpClient = okHttpClient;
         return this;
     }
 
@@ -158,7 +196,8 @@ public class RxRapidApiBuilder {
                     apiPackageAnnotation, methodApiPackageAnnotation,
                     method, project, key, apiPackage, classLevelDefaults,
                     methodLevelDefaults.get(method.getName()),
-                    defaultParametersAnnotation, methodDefaultParametersAnnotation);
+                    defaultParametersAnnotation, methodDefaultParametersAnnotation,
+                    new CallConfiguration.Server(server, okHttpClient, gson));
             callConfigurationMap.put(method.getName(), configuration);
         }
 

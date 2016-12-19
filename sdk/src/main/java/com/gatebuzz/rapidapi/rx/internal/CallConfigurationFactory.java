@@ -2,21 +2,27 @@ package com.gatebuzz.rapidapi.rx.internal;
 
 import com.gatebuzz.rapidapi.rx.*;
 import com.gatebuzz.rapidapi.rx.internal.CallConfiguration.Parameter;
+import com.gatebuzz.rapidapi.rx.internal.CallConfiguration.Server;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.*;
 
 public class CallConfigurationFactory {
 
-    public static final String[] EMPTY = new String[0];
+    private static final String[] EMPTY = new String[0];
 
     public static CallConfiguration newInstance(
             Application classApplicationAnnotation, Application methodApplicationAnnotation,
             ApiPackage classApiPackageAnnotation, ApiPackage methodApiPackageAnnotation,
             Method method, String project, String key, String apiPackage,
             Map<String, String> classLevelDefaults, Map<String, String> methodLevelDefaults,
-            DefaultParameters classDefaultValueNamesAnnotation, DefaultParameters methodDefaultValueNamesAnnotation) {
+            DefaultParameters classDefaultValueNamesAnnotation, DefaultParameters methodDefaultValueNamesAnnotation,
+            Server server) {
+        validateServer(server);
+
         String resolvedProject = fromAnnotation(Application::project,
                 project, methodApplicationAnnotation, classApplicationAnnotation,
                 "Project name not found (check the @Application annotation).");
@@ -44,15 +50,30 @@ public class CallConfigurationFactory {
 
         List<Parameter> defaultValueNames = collectDefaultValueNames(classDefaultValueNamesAnnotation, methodDefaultValueNamesAnnotation);
 
-        return new CallConfiguration(resolvedProject, resolvedKey, resolvedApiPackage,
+        return new CallConfiguration(server, resolvedProject, resolvedKey, resolvedApiPackage,
                 name, parameters, classLevelDefaults, methodLevelDefaults, defaultValueNames);
     }
 
-    private static List<Parameter> collectDefaultValueNames(DefaultParameters classDefaultValueNamesAnnotation,
-                                                            DefaultParameters methodDefaultValueNamesAnnotation) {
+    private static void validateServer(Server server) {
+        try {
+            new URL(server.serverUrl);
+        } catch (MalformedURLException e) {
+            throw new IllegalArgumentException("Malformed server URL: \"" + server.serverUrl+"\"");
+        }
+
+        if (server.gson == null) {
+            throw new IllegalArgumentException("Gson parser cannot be null");
+        }
+
+        if (server.okHttpClient == null) {
+            throw new IllegalArgumentException("OkHttpClient cannot be null");
+        }
+    }
+
+    private static List<Parameter> collectDefaultValueNames(DefaultParameters classDefault, DefaultParameters methodDefault) {
         List<Parameter> defaultValueNames = new ArrayList<>();
-        defaultValueNames.addAll(getParameters(classDefaultValueNamesAnnotation));
-        defaultValueNames.addAll(getParameters(methodDefaultValueNamesAnnotation));
+        defaultValueNames.addAll(getParameters(classDefault));
+        defaultValueNames.addAll(getParameters(methodDefault));
         return defaultValueNames;
     }
 
@@ -74,19 +95,21 @@ public class CallConfigurationFactory {
         Annotation[][] parameterAnnotations = method.getParameterAnnotations();
         List<Parameter> parameters = new ArrayList<>();
         for (Annotation[] annotations : parameterAnnotations) {
-            Parameter p = new Parameter();
+            String name = null;
+            boolean urlEncoded = false;
+            boolean required = false;
             for (Annotation annotation : annotations) {
                 Class<? extends Annotation> annotationType = annotation.annotationType();
                 if (Named.class.equals(annotationType)) {
-                    p.name = ((Named) annotation).value();
+                    name = ((Named) annotation).value();
                 } else if (UrlEncoded.class.equals(annotationType)) {
-                    p.urlEncoded = true;
+                    urlEncoded = true;
                 } else if (Required.class.equals(annotationType)) {
-                    p.required = true;
+                    required = true;
                 }
             }
-            if (p.name != null) {
-                parameters.add(p);
+            if (name != null) {
+                parameters.add(new Parameter(name, urlEncoded, required));
             }
         }
         return parameters;

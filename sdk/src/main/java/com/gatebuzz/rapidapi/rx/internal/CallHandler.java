@@ -1,5 +1,7 @@
 package com.gatebuzz.rapidapi.rx.internal;
 
+import rx.Single;
+
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
@@ -7,13 +9,10 @@ import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.gatebuzz.rapidapi.rx.internal.CallConfiguration.*;
+import static com.gatebuzz.rapidapi.rx.internal.CallConfiguration.Parameter;
 
 public class CallHandler implements java.lang.reflect.InvocationHandler {
-    private static final String FILE = "file";
-    private static final String DATA = "data";
     private static final String UTF_8 = "UTF-8";
-    private static final String SINGLE = "Single";
     private final Map<String, CallConfiguration> callConfigurationMap;
     private final EngineYard engineYard;
 
@@ -54,12 +53,12 @@ public class CallHandler implements java.lang.reflect.InvocationHandler {
         }
 
         Engine engine = engineYard.newInstance(configuration, body);
-        return SINGLE.equals(method.getReturnType().getSimpleName()) ? engine.getSingle() : engine.getObservable();
+        return Single.class.equals(method.getReturnType()) ? engine.getSingle() : engine.getObservable();
     }
 
     private void putBody(Map<String, Pair<String, String>> body, Parameter parameter, Object parameterValue) {
         if (parameterValue instanceof File) {
-            body.put(parameter.name, new Pair<>(FILE, ((File) parameterValue).getAbsolutePath()));
+            body.put(parameter.name, Pair.file(((File) parameterValue).getAbsolutePath()));
         } else {
             String value = String.valueOf(parameterValue);
             if (parameter.urlEncoded) {
@@ -68,7 +67,7 @@ public class CallHandler implements java.lang.reflect.InvocationHandler {
                 } catch (UnsupportedEncodingException ignored) {
                 }
             }
-            body.put(parameter.name, new Pair<>(DATA, value));
+            body.put(parameter.name, Pair.data(value));
         }
     }
 

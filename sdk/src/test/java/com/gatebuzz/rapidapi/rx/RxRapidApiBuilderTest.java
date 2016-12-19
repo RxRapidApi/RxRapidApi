@@ -3,6 +3,8 @@ package com.gatebuzz.rapidapi.rx;
 import com.gatebuzz.rapidapi.rx.internal.CallConfiguration;
 import com.gatebuzz.rapidapi.rx.internal.CallConfiguration.Parameter;
 import com.gatebuzz.rapidapi.rx.internal.CallHandlerFactory;
+import com.google.gson.Gson;
+import okhttp3.OkHttpClient;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -53,8 +55,47 @@ public class RxRapidApiBuilderTest {
         RxRapidApiBuilder stepSeven = builder.defaultValues("g", new HashMap<>());
         assertSame(builder, stepSeven);
 
-        BasicInterface result = stepFive.build();
+        RxRapidApiBuilder stepEight = builder.server("http://foo/");
+        assertSame(builder, stepEight);
+
+        RxRapidApiBuilder stepNine = builder.gson(new Gson());
+        assertSame(builder, stepNine);
+
+        RxRapidApiBuilder stepTen = builder.okHttpClient(new OkHttpClient());
+        assertSame(builder, stepTen);
+
+        BasicInterface result = builder.build();
         assertNotNull(result);
+    }
+
+    @Test
+    public void malformedServerUrlIsDetected() {
+        try {
+            new RxRapidApiBuilder().endpoint(BasicInterface.class).server("foo").build();
+            fail("Exception expected for invalid URL");
+        } catch (IllegalArgumentException e) {
+            assertEquals("Malformed server URL: \"foo\"", e.getMessage());
+        }
+    }
+
+    @Test
+    public void messedUpGsonIsDetected() {
+        try {
+            new RxRapidApiBuilder().endpoint(BasicInterface.class).gson(null).build();
+            fail("Exception expected for invalid Gson");
+        } catch (IllegalArgumentException e) {
+            assertEquals("Gson parser cannot be null", e.getMessage());
+        }
+    }
+
+    @Test
+    public void messedUpOkHttpClientIsDetected() {
+        try {
+            new RxRapidApiBuilder().endpoint(BasicInterface.class).okHttpClient(null).build();
+            fail("Exception expected for invalid OkHttpClient");
+        } catch (IllegalArgumentException e) {
+            assertEquals("OkHttpClient cannot be null", e.getMessage());
+        }
     }
 
     @Test
