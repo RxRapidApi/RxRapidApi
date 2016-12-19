@@ -30,6 +30,8 @@ import static org.mockito.Mockito.when;
 public class CallHandlerTest {
 
     @Mock
+    private CallConfiguration.Server server;
+    @Mock
     private Engine engine;
     @Mock
     private CallHandler.EngineYard engineYard;
@@ -53,7 +55,7 @@ public class CallHandlerTest {
 
     @Test
     public void engineConfiguredAsExpected() throws Throwable {
-        CallConfiguration configuration = new CallConfiguration("a", "b", "c", "someMethod", params, emptyMap(), emptyMap(), emptyList());
+        CallConfiguration configuration = new CallConfiguration(server, "a", "b", "c", "someMethod", params, emptyMap(), emptyMap(), emptyList());
         String expectedFirstParam = "d";
         String expectedSecondParam = "e";
 
@@ -73,7 +75,7 @@ public class CallHandlerTest {
 
     @Test
     public void optionalNullValuesAreSkipped() throws Throwable {
-        CallConfiguration configuration = new CallConfiguration("a", "b", "c", "someMethod", params, emptyMap(), emptyMap(), emptyList());
+        CallConfiguration configuration = new CallConfiguration(server, "a", "b", "c", "someMethod", params, emptyMap(), emptyMap(), emptyList());
 
         when(engineYard.newInstance(isA(CallConfiguration.class), isA(Map.class))).thenReturn(engine);
         Map<String, CallConfiguration> config = new HashMap<>();
@@ -91,7 +93,7 @@ public class CallHandlerTest {
     @Test
     public void requiredNullValuesThrowException() throws Throwable {
         params.get(0).required = true;
-        CallConfiguration configuration = new CallConfiguration("a", "b", "c", "someMethod", params, emptyMap(), emptyMap(), emptyList());
+        CallConfiguration configuration = new CallConfiguration(server, "a", "b", "c", "someMethod", params, emptyMap(), emptyMap(), emptyList());
 
         when(engineYard.newInstance(isA(CallConfiguration.class), isA(Map.class))).thenReturn(engine);
         Map<String, CallConfiguration> config = new HashMap<>();
@@ -108,7 +110,7 @@ public class CallHandlerTest {
 
     @Test
     public void defaultParametersConfiguredFromClassLevelValues() throws Throwable {
-        CallConfiguration configuration = new CallConfiguration("a", "b", "c", "someMethod", params, defaultValues, emptyMap(), defaultParameters);
+        CallConfiguration configuration = new CallConfiguration(server, "a", "b", "c", "someMethod", params, defaultValues, emptyMap(), defaultParameters);
 
         when(engineYard.newInstance(isA(CallConfiguration.class), isA(Map.class))).thenReturn(engine);
         Map<String, CallConfiguration> config = new HashMap<>();
@@ -130,7 +132,7 @@ public class CallHandlerTest {
 
     @Test
     public void methodLevelDefaultValues() throws Throwable {
-        CallConfiguration configuration = new CallConfiguration("a", "b", "c", "someMethod", params, emptyMap(), defaultValues, defaultParameters);
+        CallConfiguration configuration = new CallConfiguration(server, "a", "b", "c", "someMethod", params, emptyMap(), defaultValues, defaultParameters);
 
         when(engineYard.newInstance(isA(CallConfiguration.class), isA(Map.class))).thenReturn(engine);
         Map<String, CallConfiguration> config = new HashMap<>();
@@ -160,7 +162,7 @@ public class CallHandlerTest {
             put("key1", "m_value1");
         }};
 
-        CallConfiguration configuration = new CallConfiguration("a", "b", "c", "someMethod", params, classDefaults, methodLevelDefaults, defaultParameters);
+        CallConfiguration configuration = new CallConfiguration(server, "a", "b", "c", "someMethod", params, classDefaults, methodLevelDefaults, defaultParameters);
 
         when(engineYard.newInstance(isA(CallConfiguration.class), isA(Map.class))).thenReturn(engine);
         Map<String, CallConfiguration> config = new HashMap<>();
