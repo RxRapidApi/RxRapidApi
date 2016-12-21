@@ -7,14 +7,14 @@
 
 RxRapidApi is available on *jcenter* via Gradle
 ```
-compile 'com.gatebuzz:rxrapidapi:0.7.2'
+compile 'com.gatebuzz:rxrapidapi:0.7.3'
 ```
 or maven
 ```xml
 <dependency>
   <groupId>com.gatebuzz</groupId>
   <artifactId>rxrapidapi</artifactId>
-  <version>0.7.2</version>
+  <version>0.7.3</version>
   <type>pom</type>
 </dependency>
 ```
