@@ -1,26 +1,30 @@
 package com.gatebuzz.rapidapi.rx.internal;
 
+import com.gatebuzz.rapidapi.rx.internal.model.CallConfiguration;
+import com.gatebuzz.rapidapi.rx.internal.model.ParameterSpec;
+import com.gatebuzz.rapidapi.rx.internal.model.ParameterValue;
 import rx.Single;
 
 import java.io.File;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.net.URLEncoder;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
-import static com.gatebuzz.rapidapi.rx.internal.CallConfiguration.Parameter;
-
-public class CallHandler implements java.lang.reflect.InvocationHandler {
+public class RapidApiInvocationHandler implements InvocationHandler {
     private static final String UTF_8 = "UTF-8";
     private final Map<String, CallConfiguration> callConfigurationMap;
     private final EngineYard engineYard;
 
-    public CallHandler(Map<String, CallConfiguration> callConfigurationMap) {
+    public RapidApiInvocationHandler(Map<String, CallConfiguration> callConfigurationMap) {
         this(callConfigurationMap, new DefaultEngineYard());
     }
 
-    CallHandler(Map<String, CallConfiguration> callConfigurationMap, EngineYard engineYard) {
+    RapidApiInvocationHandler(Map<String, CallConfiguration> callConfigurationMap, EngineYard engineYard) {
         this.callConfigurationMap = callConfigurationMap;
         this.engineYard = engineYard;
     }
@@ -28,10 +32,10 @@ public class CallHandler implements java.lang.reflect.InvocationHandler {
     @Override
     public Object invoke(Object o, Method method, Object[] parameterValues) throws Throwable {
         final CallConfiguration configuration = callConfigurationMap.get(method.getName());
-        final Map<String, Pair<String, String>> body = new HashMap<>();
+        final List<ParameterValue> body = new ArrayList<>();
 
         for (int i = 0; i < configuration.parameters.size(); i++) {
-            Parameter parameter = configuration.parameters.get(i);
+            ParameterSpec parameter = configuration.parameters.get(i);
             if (parameterValues[i] != null) {
                 putBody(body, parameter, parameterValues[i]);
             } else {
@@ -42,7 +46,7 @@ public class CallHandler implements java.lang.reflect.InvocationHandler {
         }
 
         if (configuration.defaultParameters != null) {
-            for (Parameter parameter : configuration.defaultParameters) {
+            for (ParameterSpec parameter : configuration.defaultParameters) {
                 String methodValue = configuration.methodLevelDefaults.get(parameter.name);
                 String classValue = configuration.classLevelDefaults.get(parameter.name);
                 String value = methodValue != null ? methodValue : classValue != null ? classValue : null;
@@ -56,9 +60,12 @@ public class CallHandler implements java.lang.reflect.InvocationHandler {
         return Single.class.equals(method.getReturnType()) ? engine.getSingle() : engine.getObservable();
     }
 
-    private void putBody(Map<String, Pair<String, String>> body, Parameter parameter, Object parameterValue) {
-        if (parameterValue instanceof File) {
-            body.put(parameter.name, Pair.file(((File) parameterValue).getAbsolutePath()));
+    @SuppressWarnings("unchecked")
+    private void putBody(List<ParameterValue> body, ParameterSpec parameter, Object parameterValue) {
+        if (parameterValue instanceof InputStream) {
+            body.add(ParameterValue.stream(parameter.name, (InputStream) parameterValue));
+        } else if (parameterValue instanceof File) {
+            body.add(ParameterValue.file(parameter.name, (File) parameterValue));
         } else {
             String value = String.valueOf(parameterValue);
             if (parameter.urlEncoded) {
@@ -67,17 +74,17 @@ public class CallHandler implements java.lang.reflect.InvocationHandler {
                 } catch (UnsupportedEncodingException ignored) {
                 }
             }
-            body.put(parameter.name, Pair.data(value));
+            body.add(ParameterValue.data(parameter.name, value));
         }
     }
 
     interface EngineYard {
-        Engine newInstance(CallConfiguration configuration, Map<String, Pair<String, String>> body);
+        Engine newInstance(CallConfiguration configuration, List<ParameterValue> body);
     }
 
     private static class DefaultEngineYard implements EngineYard {
         @Override
-        public Engine newInstance(CallConfiguration configuration, Map<String, Pair<String, String>> body) {
+        public Engine newInstance(CallConfiguration configuration, List<ParameterValue> body) {
             return new Engine(configuration, body);
         }
     }

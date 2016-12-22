@@ -7,6 +7,7 @@ import com.gatebuzz.rapidapi.rx.Required;
 import rx.Observable;
 
 import java.io.File;
+import java.io.InputStream;
 import java.util.Map;
 
 @ApiPackage("Slack")
@@ -320,7 +321,7 @@ public interface SlackApi {
     );
 
     Observable<Map<String, Object>> uploadFile(
-            @Required @Named("file") File file,
+            @Required @Named("file") InputStream file,
             @Named("filetype") String fileType,
             @Named("filename") String filename,
             @Named("title") String title,

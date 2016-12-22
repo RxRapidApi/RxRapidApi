@@ -3,7 +3,10 @@ package com.gatebuzz.rapidapi.rx.internal;
 import com.gatebuzz.rapidapi.rx.ApiPackage;
 import com.gatebuzz.rapidapi.rx.Application;
 import com.gatebuzz.rapidapi.rx.Named;
-import com.gatebuzz.rapidapi.rx.internal.CallConfiguration.Parameter;
+import com.gatebuzz.rapidapi.rx.internal.model.CallConfiguration;
+import com.gatebuzz.rapidapi.rx.internal.model.ParameterSpec;
+import com.gatebuzz.rapidapi.rx.internal.model.ParameterValue;
+import com.gatebuzz.rapidapi.rx.internal.model.Server;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,8 +21,8 @@ import java.util.*;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.fail;
+import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Matchers.isA;
 import static org.mockito.Matchers.same;
 import static org.mockito.Mockito.verify;
@@ -27,27 +30,27 @@ import static org.mockito.Mockito.when;
 
 @SuppressWarnings({"unchecked", "Duplicates"})
 @RunWith(MockitoJUnitRunner.class)
-public class CallHandlerTest {
+public class RapidApiInvocationHandlerTest {
 
     @Mock
-    private CallConfiguration.Server server;
+    private Server server;
     @Mock
     private Engine engine;
     @Mock
-    private CallHandler.EngineYard engineYard;
+    private RapidApiInvocationHandler.EngineYard engineYard;
     @Mock
     private ResponseProcessor processor;
     @Captor
-    private ArgumentCaptor<Map<String, Pair<String, String>>> args;
+    private ArgumentCaptor<List<ParameterValue>> args;
 
-    private List<Parameter> params;
-    private List<Parameter> defaultParameters;
+    private List<ParameterSpec> params;
+    private List<ParameterSpec> defaultParameters;
     private Map<String, String> defaultValues;
 
     @Before
     public void setUp() throws Exception {
-        params = Arrays.asList(new Parameter("first"), new Parameter("second"));
-        defaultParameters = Arrays.asList(new Parameter("key1"), new Parameter("key2"));
+        params = Arrays.asList(new ParameterSpec("name"), new ParameterSpec("value"));
+        defaultParameters = Arrays.asList(new ParameterSpec("key1"), new ParameterSpec("key2"));
         defaultValues = new HashMap<String, String>() {{
             put("key1", "value1");
             put("key2", "value2");
@@ -61,35 +64,32 @@ public class CallHandlerTest {
         String expectedFirstParam = "d";
         String expectedSecondParam = "e";
 
-        when(engineYard.newInstance(isA(CallConfiguration.class), isA(Map.class))).thenReturn(engine);
+        when(engineYard.newInstance(isA(CallConfiguration.class), anyListOf(ParameterValue.class))).thenReturn(engine);
         Map<String, CallConfiguration> config = new HashMap<>();
         config.put("someMethod", configuration);
-        CallHandler handler = new CallHandler(config, engineYard);
+        RapidApiInvocationHandler handler = new RapidApiInvocationHandler(config, engineYard);
         handler.invoke(null, SomeInterface.class.getMethod("someMethod", String.class, String.class),
                 new Object[]{expectedFirstParam, expectedSecondParam});
 
         verify(engineYard).newInstance(same(configuration), args.capture());
-        assertEquals("data", args.getValue().get("first").first);
-        assertEquals(expectedFirstParam, args.getValue().get("first").second);
-        assertEquals("data", args.getValue().get("second").first);
-        assertEquals(expectedSecondParam, args.getValue().get("second").second);
+        assertParameter(args.getValue(), "name", expectedFirstParam);
+        assertParameter(args.getValue(), "value", expectedSecondParam);
     }
 
     @Test
     public void optionalNullValuesAreSkipped() throws Throwable {
         CallConfiguration configuration = new CallConfiguration(server, "a", "b", "c", "someMethod", params, emptyMap(), emptyMap(), emptyList(), processor);
 
-        when(engineYard.newInstance(isA(CallConfiguration.class), isA(Map.class))).thenReturn(engine);
+        when(engineYard.newInstance(isA(CallConfiguration.class), anyListOf(ParameterValue.class))).thenReturn(engine);
         Map<String, CallConfiguration> config = new HashMap<>();
         config.put("someMethod", configuration);
-        CallHandler handler = new CallHandler(config, engineYard);
+        RapidApiInvocationHandler handler = new RapidApiInvocationHandler(config, engineYard);
         handler.invoke(null, SomeInterface.class.getMethod("someMethod", String.class, String.class),
                 new Object[]{null, "present"});
 
         verify(engineYard).newInstance(same(configuration), args.capture());
-        assertFalse(args.getValue().containsKey("first"));
-        assertEquals("data", args.getValue().get("second").first);
-        assertEquals("present", args.getValue().get("second").second);
+        assertEquals(1, args.getValue().size());
+        assertParameter(args.getValue(), "value", "present");
     }
 
     @Test
@@ -97,16 +97,16 @@ public class CallHandlerTest {
         params.get(0).required = true;
         CallConfiguration configuration = new CallConfiguration(server, "a", "b", "c", "someMethod", params, emptyMap(), emptyMap(), emptyList(), processor);
 
-        when(engineYard.newInstance(isA(CallConfiguration.class), isA(Map.class))).thenReturn(engine);
+        when(engineYard.newInstance(isA(CallConfiguration.class), anyListOf(ParameterValue.class))).thenReturn(engine);
         Map<String, CallConfiguration> config = new HashMap<>();
         config.put("someMethod", configuration);
-        CallHandler handler = new CallHandler(config, engineYard);
+        RapidApiInvocationHandler handler = new RapidApiInvocationHandler(config, engineYard);
         try {
             handler.invoke(null, SomeInterface.class.getMethod("someMethod", String.class, String.class),
                     new Object[]{null, "present"});
             fail("Required (but null) parameter should throw exception");
         } catch (IllegalArgumentException iar) {
-            assertEquals("Calling \"someMethod\" - required parameter \"first\" is null.", iar.getMessage());
+            assertEquals("Calling \"someMethod\" - required parameter \"name\" is null.", iar.getMessage());
         }
     }
 
@@ -114,44 +114,36 @@ public class CallHandlerTest {
     public void defaultParametersConfiguredFromClassLevelValues() throws Throwable {
         CallConfiguration configuration = new CallConfiguration(server, "a", "b", "c", "someMethod", params, defaultValues, emptyMap(), defaultParameters, processor);
 
-        when(engineYard.newInstance(isA(CallConfiguration.class), isA(Map.class))).thenReturn(engine);
+        when(engineYard.newInstance(isA(CallConfiguration.class), anyListOf(ParameterValue.class))).thenReturn(engine);
         Map<String, CallConfiguration> config = new HashMap<>();
         config.put("someMethod", configuration);
-        CallHandler handler = new CallHandler(config, engineYard);
+        RapidApiInvocationHandler handler = new RapidApiInvocationHandler(config, engineYard);
         handler.invoke(null, SomeInterface.class.getMethod("someMethod", String.class, String.class),
                 new Object[]{"a", "b"});
 
         verify(engineYard).newInstance(same(configuration), args.capture());
-        assertEquals("data", args.getValue().get("first").first);
-        assertEquals("a", args.getValue().get("first").second);
-        assertEquals("data", args.getValue().get("second").first);
-        assertEquals("b", args.getValue().get("second").second);
-        assertEquals("data", args.getValue().get("key1").first);
-        assertEquals("value1", args.getValue().get("key1").second);
-        assertEquals("data", args.getValue().get("key2").first);
-        assertEquals("value2", args.getValue().get("key2").second);
+        assertParameter(args.getValue(), "name", "a");
+        assertParameter(args.getValue(), "value", "b");
+        assertParameter(args.getValue(), "key1", "value1");
+        assertParameter(args.getValue(), "key2", "value2");
     }
 
     @Test
     public void methodLevelDefaultValues() throws Throwable {
         CallConfiguration configuration = new CallConfiguration(server, "a", "b", "c", "someMethod", params, emptyMap(), defaultValues, defaultParameters, processor);
 
-        when(engineYard.newInstance(isA(CallConfiguration.class), isA(Map.class))).thenReturn(engine);
+        when(engineYard.newInstance(isA(CallConfiguration.class), anyListOf(ParameterValue.class))).thenReturn(engine);
         Map<String, CallConfiguration> config = new HashMap<>();
         config.put("someMethod", configuration);
-        CallHandler handler = new CallHandler(config, engineYard);
+        RapidApiInvocationHandler handler = new RapidApiInvocationHandler(config, engineYard);
         handler.invoke(null, SomeInterface.class.getMethod("someMethod", String.class, String.class),
                 new Object[]{"a", "b"});
 
         verify(engineYard).newInstance(same(configuration), args.capture());
-        assertEquals("data", args.getValue().get("first").first);
-        assertEquals("a", args.getValue().get("first").second);
-        assertEquals("data", args.getValue().get("second").first);
-        assertEquals("b", args.getValue().get("second").second);
-        assertEquals("data", args.getValue().get("key1").first);
-        assertEquals("value1", args.getValue().get("key1").second);
-        assertEquals("data", args.getValue().get("key2").first);
-        assertEquals("value2", args.getValue().get("key2").second);
+        assertParameter(args.getValue(), "name", "a");
+        assertParameter(args.getValue(), "value", "b");
+        assertParameter(args.getValue(), "key1", "value1");
+        assertParameter(args.getValue(), "key2", "value2");
     }
 
     @Test
@@ -166,30 +158,36 @@ public class CallHandlerTest {
 
         CallConfiguration configuration = new CallConfiguration(server, "a", "b", "c", "someMethod", params, classDefaults, methodLevelDefaults, defaultParameters, processor);
 
-        when(engineYard.newInstance(isA(CallConfiguration.class), isA(Map.class))).thenReturn(engine);
+        when(engineYard.newInstance(isA(CallConfiguration.class), anyListOf(ParameterValue.class))).thenReturn(engine);
         Map<String, CallConfiguration> config = new HashMap<>();
         config.put("someMethod", configuration);
-        CallHandler handler = new CallHandler(config, engineYard);
+        RapidApiInvocationHandler handler = new RapidApiInvocationHandler(config, engineYard);
         handler.invoke(null, SomeInterface.class.getMethod("someMethod", String.class, String.class),
                 new Object[]{"a", "b"});
 
         verify(engineYard).newInstance(same(configuration), args.capture());
-        assertEquals("data", args.getValue().get("first").first);
-        assertEquals("a", args.getValue().get("first").second);
-        assertEquals("data", args.getValue().get("second").first);
-        assertEquals("b", args.getValue().get("second").second);
-        assertEquals("data", args.getValue().get("key1").first);
-        assertEquals("m_value1", args.getValue().get("key1").second);
-        assertEquals("data", args.getValue().get("key2").first);
-        assertEquals("value2", args.getValue().get("key2").second);
+        assertParameter(args.getValue(), "name", "a");
+        assertParameter(args.getValue(), "value", "b");
+        assertParameter(args.getValue(), "key1", "m_value1");
+        assertParameter(args.getValue(), "key2", "value2");
+    }
+
+    private void assertParameter(List<ParameterValue> parameters, String name, String expected) {
+        for (ParameterValue parameter : parameters) {
+            if (parameter.name.equals(name)) {
+                assertEquals(expected, parameter.value);
+                return;
+            }
+        }
+        fail("Parameter \"" + name + "\" doesn't exist.");
     }
 
     @Application(project = "a", key = "b")
     interface SomeInterface {
         @ApiPackage("c")
         Observable<Map<String, Object>> someMethod(
-                @Named("first") String f,
-                @Named("second") String s
+                @Named("name") String f,
+                @Named("value") String s
         );
     }
 }
