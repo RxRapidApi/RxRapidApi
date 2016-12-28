@@ -3,11 +3,8 @@ package com.gatebuzz.rapidapi.rx.example.spotify;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputEditText;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.ViewFlipper;
@@ -15,6 +12,8 @@ import android.widget.ViewFlipper;
 import com.gatebuzz.rapidapi.rx.example.ExampleApplication;
 import com.gatebuzz.rapidapi.rx.example.ManagedSubscriptionsActivity;
 import com.gatebuzz.rapidapi.rx.example.R;
+import com.gatebuzz.rapidapi.rx.example.spotify.model.SearchResult;
+import com.gatebuzz.rapidapi.rx.example.spotify.model.SearchStatus;
 import com.jakewharton.rxbinding.view.RxView;
 
 import rx.android.schedulers.AndroidSchedulers;
@@ -49,11 +48,9 @@ public class SpotifySearchActivity extends ManagedSubscriptionsActivity {
     }
 
     private void displayResults(SearchResult searchResult) {
-        Log.e("Example", "###  After: thread name=" + Thread.currentThread().getName() + " - id=" + Thread.currentThread().getId());
     }
 
     private void displayStatus(SearchStatus searchStatus) {
-        Log.e("Example", "### Status: thread name=" + Thread.currentThread().getName() + " - id=" + Thread.currentThread().getId());
         showSpinner(searchStatus.albums, R.id.album_progress, R.id.album_progress_icon, R.id.album_progress_spinner);
         showSpinner(searchStatus.artists, R.id.artists_progress, R.id.artists_progress_icon, R.id.artists_progress_spinner);
         showSpinner(searchStatus.playlists, R.id.playlists_progress, R.id.playlists_progress_icon, R.id.playlists_progress_spinner);
