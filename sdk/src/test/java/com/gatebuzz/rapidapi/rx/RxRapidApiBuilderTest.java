@@ -4,8 +4,10 @@ import com.gatebuzz.rapidapi.rx.internal.CallConfiguration;
 import com.gatebuzz.rapidapi.rx.internal.CallConfiguration.Parameter;
 import com.gatebuzz.rapidapi.rx.internal.CallHandlerFactory;
 import com.google.gson.Gson;
+import com.google.gson.annotations.SerializedName;
 import okhttp3.OkHttpClient;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
@@ -13,17 +15,15 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import rx.Observable;
 import rx.Single;
+import rx.Subscriber;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "unchecked", "SameParameterValue"})
 @RunWith(MockitoJUnitRunner.class)
 public class RxRapidApiBuilderTest {
 
@@ -429,6 +429,130 @@ public class RxRapidApiBuilderTest {
             new RxRapidApiBuilder().endpoint(ApiPackageOnClass.class).build();
         } catch (Exception e) {
             fail("No exception expected");
+        }
+    }
+    //endregion
+
+    //region Complex return types
+    @Test
+    public void complexReturnTypeConsumed() {
+        try {
+            new RxRapidApiBuilder()
+                    .application("Rapid_Api_Unit_Tests", "ff0df8fb-2cd5-448f-be44-44ec3c318338")
+                    .endpoint(ComplexReturnType.class).build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail("No exception expected");
+        }
+    }
+
+    @Test
+    @Category(LiveService.class)
+    public void integrationTestWithComplexType() {
+        try {
+            ComplexReturnType api = new RxRapidApiBuilder()
+                    .endpoint(ComplexReturnType.class)
+                    .application("Rapid_Api_Unit_Tests", "ff0df8fb-2cd5-448f-be44-44ec3c318338")
+                    .build();
+
+            api.searchAlbumsAsComplex("laura bono")
+                    .doOnNext(wrapper -> {
+                        assertNotNull(wrapper);
+                        assertNotNull(wrapper.albums);
+                        assertNotNull(wrapper.albums.href);
+                        assertNotNull(wrapper.albums.limit);
+                        assertNotNull(wrapper.albums.items);
+                        assertFalse(wrapper.albums.items.isEmpty());
+                    })
+                    .flatMap(wrapper -> Observable.from(wrapper.albums.items))
+                    .doOnNext(album -> {
+                        assertNotNull(album.id);
+                        assertNotNull(album.name);
+                        assertNotNull(album.markets);
+                    }).subscribe();
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail("No exception expected");
+        }
+    }
+
+    @Test
+    @Category(LiveService.class)
+    public void integrationTestWithMapType() {
+        try {
+            ComplexReturnType api = new RxRapidApiBuilder()
+                    .endpoint(ComplexReturnType.class)
+                    .application("Rapid_Api_Unit_Tests", "ff0df8fb-2cd5-448f-be44-44ec3c318338")
+                    .build();
+
+            api.searchAlbumsAsMap("laura bono")
+                    .subscribe(new Subscriber<Map<String, Object>>() {
+                        @Override
+                        public void onCompleted() {
+
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            e.printStackTrace();
+                            fail("No exception expected");
+                        }
+
+                        @Override
+                        public void onNext(Map<String, Object> result) {
+                            assertNotNull(result);
+                            assertNotNull(result.get("success"));
+
+                            Map<String, Object> success = (Map<String, Object>) result.get("success");
+                            Map<String, Object> albums = (Map<String, Object>) success.get("albums");
+                            assertNotNull(albums);
+                            assertNotNull(albums.get("href"));
+                            assertNotNull(albums.get("limit"));
+                            assertNotNull(albums.get("items"));
+
+                            List<Map<String, Object>> items = (List<Map<String, Object>>) albums.get("items");
+                            assertNotNull(items);
+                            assertFalse(items.isEmpty());
+
+                            for (Map<String, Object> item : items) {
+                                assertNotNull(item.get("id"));
+                                assertNotNull(item.get("name"));
+                                assertNotNull(item.get("available_markets"));
+                            }
+                        }
+                    });
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail("No exception expected");
+        }
+    }
+
+    @ApiPackage("SpotifyPublicAPI")
+    private interface ComplexReturnType {
+        @Named("searchAlbums")
+        Observable<AlbumsWrapper> searchAlbumsAsComplex(@Named("query") String query);
+
+        @Named("searchAlbums")
+        Observable<Map<String, Object>> searchAlbumsAsMap(@Named("query") String query);
+    }
+
+    public static class BaseType {
+        String id;
+        String name;
+    }
+
+    public static class Album extends BaseType {
+        @SerializedName("available_markets")
+        List<String> markets;
+    }
+
+    public static class AlbumsWrapper {
+        Wrapper albums;
+
+        public static class Wrapper {
+            String href;
+            String limit;
+            List<Album> items;
         }
     }
     //endregion

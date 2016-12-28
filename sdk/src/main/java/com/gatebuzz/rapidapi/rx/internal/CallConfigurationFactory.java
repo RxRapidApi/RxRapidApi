@@ -8,7 +8,9 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class CallConfigurationFactory {
 
@@ -20,7 +22,7 @@ public class CallConfigurationFactory {
             Method method, String project, String key, String apiPackage,
             Map<String, String> classLevelDefaults, Map<String, String> methodLevelDefaults,
             DefaultParameters classDefaults, DefaultParameters methodDefaults,
-            Server server) {
+            Server server, ResponseProcessor responseProcessor) {
         validateServer(server);
 
         String resolvedProject = fromAnnotation(Application::project,
@@ -51,14 +53,15 @@ public class CallConfigurationFactory {
         List<Parameter> defaultValueNames = collectDefaultValueNames(classDefaults, methodDefaults);
 
         return new CallConfiguration(server, resolvedProject, resolvedKey, resolvedApiPackage,
-                name, parameters, classLevelDefaults, methodLevelDefaults, defaultValueNames);
+                name, parameters, classLevelDefaults, methodLevelDefaults, defaultValueNames,
+                responseProcessor);
     }
 
     private static void validateServer(Server server) {
         try {
             new URL(server.serverUrl);
         } catch (MalformedURLException e) {
-            throw new IllegalArgumentException("Malformed server URL: \"" + server.serverUrl+"\"");
+            throw new IllegalArgumentException("Malformed server URL: \"" + server.serverUrl + "\"");
         }
 
         if (server.gson == null) {

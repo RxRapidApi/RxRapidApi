@@ -1,20 +1,23 @@
 package com.gatebuzz.rapidapi.rx;
 
-import com.gatebuzz.rapidapi.rx.internal.CallConfiguration;
-import com.gatebuzz.rapidapi.rx.internal.CallConfigurationFactory;
-import com.gatebuzz.rapidapi.rx.internal.CallHandler;
-import com.gatebuzz.rapidapi.rx.internal.CallHandlerFactory;
+import com.gatebuzz.rapidapi.rx.internal.*;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import okhttp3.OkHttpClient;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Proxy;
+import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 @SuppressWarnings({"WeakerAccess", "unchecked"})
 public class RxRapidApiBuilder {
+
+    public static final Type MAP_STRING_TO_OBJECT = new TypeToken<Map<String, Object>>() {
+    }.getType();
 
     private final CallHandlerFactory callHandlerFactory;
     private final Map<String, String> classLevelDefaults = new HashMap<>();
@@ -192,13 +195,23 @@ public class RxRapidApiBuilder {
             ApiPackage methodApiPackageAnnotation = method.getAnnotation(ApiPackage.class);
             DefaultParameters methodDefaultParametersAnnotation = method.getAnnotation(DefaultParameters.class);
 
+            Type declaredReturnType = method.getGenericReturnType();
+            ResponseProcessor processor = KeyValueMapProcessor.success();
+            if (declaredReturnType instanceof ParameterizedType) {
+                Type[] typeArguments = ((ParameterizedType)declaredReturnType).getActualTypeArguments();
+                if (typeArguments != null && typeArguments.length > 0 && !MAP_STRING_TO_OBJECT.equals(typeArguments[0])) {
+                    processor = new CustomTypeResponseProcessor(typeArguments[0]);
+                }
+            }
+
             CallConfiguration configuration = CallConfigurationFactory.newInstance(
                     applicationAnnotation, methodAppAnnotation,
                     apiPackageAnnotation, methodApiPackageAnnotation,
                     method, project, key, apiPackage, classLevelDefaults,
                     getMethodLevelDefaultsOrEmpty(method),
                     defaultParametersAnnotation, methodDefaultParametersAnnotation,
-                    new CallConfiguration.Server(server, okHttpClient, gson));
+                    new CallConfiguration.Server(server, okHttpClient, gson),
+                    processor);
             callConfigurationMap.put(method.getName(), configuration);
         }
 

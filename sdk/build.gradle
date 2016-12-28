@@ -39,4 +39,10 @@ task(runRetrolambda, type: JavaExec) {
     ]
 }
 
+test {
+    useJUnit {
+        excludeCategories 'com.gatebuzz.rapidapi.rx.LiveService'
+    }
+}
+
 classes.dependsOn runRetrolambda
