@@ -4,7 +4,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.3'
+        classpath 'com.android.tools.build:gradle:2.3.0-alpha2'
         classpath 'me.tatarka:gradle-retrolambda:3.3.0'
     }
 }
@@ -31,12 +31,13 @@ def rapidApiKey = properties.getProperty('rapidapi.api.key')
 
 android {
     compileSdkVersion 24
-    buildToolsVersion "24.0.3"
+    buildToolsVersion '25.0.0'
     defaultConfig {
         applicationId "com.gatebuzz.rapidapi.rx.example"
         minSdkVersion 19
         targetSdkVersion 24
         versionCode 1
+        vectorDrawables.useSupportLibrary true
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         buildConfigField "String", "PROJECT", "\"${rapidApiProject}\""
@@ -62,19 +63,25 @@ android {
 }
 
 dependencies {
-    compile 'io.reactivex:rxandroid:1.2.1'
-    compile 'io.reactivex:rxjava:1.1.6'
+    
 
     // Depend on production version
     // compile 'com.gatebuzz:rxrapidapi:0.7.3'
 
     // Depend on local development version
     compile files('../../sdk/build/libs/RxRapidApiSdk.jar')
+
+    compile 'io.reactivex:rxandroid:1.2.1'
+    compile 'io.reactivex:rxjava:1.1.6'
+    compile 'io.reactivex:rxjava-computation-expressions:0.21.0'
+
+    compile 'com.jakewharton.rxbinding:rxbinding:1.0.0'
+
     compile 'com.squareup.okhttp3:okhttp:3.4.2'
     compile 'com.squareup.okio:okio:1.9.0'
     compile 'com.google.code.gson:gson:2.8.0'
     compile 'com.squareup.okhttp3:logging-interceptor:3.5.0'
-
     compile 'com.android.support:appcompat-v7:24.2.1'
     compile 'com.android.support:design:24.2.1'
+    compile 'com.android.support.constraint:constraint-layout:1.0.0-alpha4'
 }
