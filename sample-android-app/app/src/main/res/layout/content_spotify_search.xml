@@ -11,8 +11,8 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.gatebuzz.rapidapi.rx.example.spotify.SpotifyMenuActivity"
-    tools:showIn="@layout/activity_spotify_menu">
+    tools:context="com.gatebuzz.rapidapi.rx.example.spotify.SpotifySearchActivity"
+    tools:showIn="@layout/activity_spotify_search">
 
     <android.support.design.widget.TextInputLayout
         android:layout_width="match_parent"
@@ -60,6 +60,13 @@
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="4dp" />
 
+                    <ImageView
+                        android:id="@+id/album_progress_icon"
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:layout_marginEnd="4dp"
+                        app:srcCompat="@drawable/ic_check_black" />
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -91,6 +98,13 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="4dp" />
+
+                    <ImageView
+                        android:id="@+id/artists_progress_icon"
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:layout_marginEnd="4dp"
+                        app:srcCompat="@drawable/ic_check_black" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -126,6 +140,13 @@
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="4dp" />
 
+                    <ImageView
+                        android:id="@+id/playlists_progress_icon"
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:layout_marginEnd="4dp"
+                        app:srcCompat="@drawable/ic_check_black" />
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -155,6 +176,13 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="4dp" />
+
+                    <ImageView
+                        android:id="@+id/tracks_progress_icon"
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:layout_marginEnd="4dp"
+                        app:srcCompat="@drawable/ic_check_black" />
 
                     <TextView
                         android:layout_width="wrap_content"

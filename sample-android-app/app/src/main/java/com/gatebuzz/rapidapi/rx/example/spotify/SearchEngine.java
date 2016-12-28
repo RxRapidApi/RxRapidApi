@@ -1,12 +1,14 @@
 package com.gatebuzz.rapidapi.rx.example.spotify;
 
-import android.support.annotation.NonNull;
+import android.util.Log;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import rx.Observable;
+import rx.functions.Action0;
 import rx.functions.Action1;
+import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 import rx.subjects.BehaviorSubject;
 
@@ -38,30 +40,35 @@ public class SearchEngine {
     }
 
     public void startSearch(String search, boolean albums, boolean artists, boolean playlists, boolean tracks) {
-        currentSearch = new SearchStatus(albums, artists, playlists, tracks);
+        currentSearch = new SearchStatus(
+                albums ? SearchStatus.STARTED : SearchStatus.SKIPPED,
+                artists ? SearchStatus.STARTED : SearchStatus.SKIPPED,
+                playlists ? SearchStatus.STARTED : SearchStatus.SKIPPED,
+                tracks ? SearchStatus.STARTED : SearchStatus.SKIPPED);
         statusSubject.onNext(currentSearch);
 
+        Log.e("Example", "### Before: thread name=" + Thread.currentThread().getName() + " - id=" + Thread.currentThread().getId());
         Observable.combineLatest(
-                ifThen(() -> albums, searchAndHandleErrors(spotifyApi.searchAlbums(search, null, null, null), o -> currentSearch.albums = false), empty()),
-                ifThen(() -> artists, searchAndHandleErrors(spotifyApi.searchArtists(search, null, null, null), o -> currentSearch.artists = false), empty()),
-                ifThen(() -> playlists, searchAndHandleErrors(spotifyApi.searchPlaylists(search, null, null, null), o -> currentSearch.playlists = false), empty()),
-                ifThen(() -> tracks, searchAndHandleErrors(spotifyApi.searchTracks(search, null, null, null), o -> currentSearch.tracks = false), empty()),
+                search(albums, spotifyApi.searchAlbums(search, null, null, null), currentSearch::finishAlbums),
+                search(artists, spotifyApi.searchArtists(search, null, null, null), currentSearch::finishArtists),
+                search(playlists, spotifyApi.searchPlaylists(search, null, null, null), currentSearch::finishPlaylists),
+                search(tracks, spotifyApi.searchTracks(search, null, null, null), currentSearch::finishTracks),
                 SearchResult::new)
                 .doOnNext(searchResult -> clearStatus())
                 .subscribe(resultsSubject::onNext);
     }
 
-    @NonNull
-    private Observable<HashMap<String, Object>> empty() {
-        return Observable.just(new HashMap<>());
+    private Observable<Map<String, Object>> search(boolean shouldRun, Observable<Map<String, Object>> serviceCall, final Action0 statusUpdateOnFinish) {
+        Log.e("Example", "###  Setup: thread name=" + Thread.currentThread().getName() + " - id=" + Thread.currentThread().getId());
+        Observable<Map<String, Object>> then = serviceCall
+                .onErrorResumeNext(t -> Observable.just(new HashMap<>()))
+                .doOnNext(r -> Log.e("Example", "###   Call: thread name=" + Thread.currentThread().getName() + " - id=" + Thread.currentThread().getId()))
+                .doOnNext(r -> statusUpdateOnFinish.call())
+                .doOnNext(r -> statusSubject.onNext(currentSearch));
+
+        Observable<HashMap<String, Object>> orElse = Observable.just(new HashMap<>());
+
+        return ifThen(() -> shouldRun, then, orElse);
     }
 
-    @NonNull
-    private Observable<Map<String, Object>> searchAndHandleErrors(Observable<Map<String, Object>> searchObservable, Action1<Map<String, Object>> statusUpdate) {
-        return searchObservable
-                .subscribeOn(Schedulers.newThread())
-                .onErrorResumeNext(t -> empty())
-                .doOnNext(statusUpdate)
-                .doOnNext(stringObjectMap -> statusSubject.onNext(currentSearch));
-    }
 }

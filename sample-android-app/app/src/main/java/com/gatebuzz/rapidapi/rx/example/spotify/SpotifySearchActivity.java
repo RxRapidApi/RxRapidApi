@@ -7,6 +7,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputEditText;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.ViewFlipper;
@@ -18,28 +19,23 @@ import com.jakewharton.rxbinding.view.RxView;
 
 import rx.android.schedulers.AndroidSchedulers;
 
-public class SpotifyMenuActivity extends ManagedSubscriptionsActivity {
+public class SpotifySearchActivity extends ManagedSubscriptionsActivity {
 
     private SearchEngine searchEngine;
 
     public static void launch(Context context) {
-        context.startActivity(new Intent(context, SpotifyMenuActivity.class));
+        context.startActivity(new Intent(context, SpotifySearchActivity.class));
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_spotify_menu);
+        setContentView(R.layout.activity_spotify_search);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(view -> Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show());
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        searchEngine = new SearchEngine(((ExampleApplication) getApplication()).getSpotifyApi());
-        searchEngine.clearStatus();
+        searchEngine = ((ExampleApplication) getApplication()).getSpotifySearchEngine();
     }
 
     @Override
@@ -53,18 +49,22 @@ public class SpotifyMenuActivity extends ManagedSubscriptionsActivity {
     }
 
     private void displayResults(SearchResult searchResult) {
+        Log.e("Example", "###  After: thread name=" + Thread.currentThread().getName() + " - id=" + Thread.currentThread().getId());
     }
 
     private void displayStatus(SearchStatus searchStatus) {
-        showSpinner(searchStatus.albums, R.id.album_progress, R.id.album_progress_spinner);
-        showSpinner(searchStatus.artists, R.id.artists_progress, R.id.artists_progress_spinner);
-        showSpinner(searchStatus.playlists, R.id.playlists_progress, R.id.playlists_progress_spinner);
-        showSpinner(searchStatus.tracks, R.id.tracks_progress, R.id.tracks_progress_spinner);
+        Log.e("Example", "### Status: thread name=" + Thread.currentThread().getName() + " - id=" + Thread.currentThread().getId());
+        showSpinner(searchStatus.albums, R.id.album_progress, R.id.album_progress_icon, R.id.album_progress_spinner);
+        showSpinner(searchStatus.artists, R.id.artists_progress, R.id.artists_progress_icon, R.id.artists_progress_spinner);
+        showSpinner(searchStatus.playlists, R.id.playlists_progress, R.id.playlists_progress_icon, R.id.playlists_progress_spinner);
+        showSpinner(searchStatus.tracks, R.id.tracks_progress, R.id.tracks_progress_icon, R.id.tracks_progress_spinner);
+        findViewById(R.id.fab).setVisibility(searchStatus.isRunning() ? View.INVISIBLE : View.VISIBLE);
     }
 
-    private void showSpinner(Boolean value, int flipperId, int spinnerId) {
-        ((ViewFlipper) findViewById(flipperId)).setDisplayedChild(value != null ? 1 : 0);
-        findViewById(spinnerId).setVisibility(Boolean.TRUE.equals(value) ? View.VISIBLE : View.INVISIBLE);
+    private void showSpinner(int value, int flipperId, int finishedId, int spinnerId) {
+        ((ViewFlipper) findViewById(flipperId)).setDisplayedChild(value == SearchStatus.NOT_RUNNING ? 0 : 1);
+        findViewById(spinnerId).setVisibility(value == SearchStatus.STARTED ? View.VISIBLE : value == SearchStatus.FINISHED ? View.GONE : View.INVISIBLE);
+        findViewById(finishedId).setVisibility(value == SearchStatus.FINISHED ? View.VISIBLE : View.GONE);
     }
 
     private void doSearch() {

@@ -2,7 +2,7 @@
     <string name="app_name">RxRapidApi</string>
     <string name="action_settings">Settings</string>
     <string name="spotify_api">Try the Spotify API</string>
-    <string name="title_activity_spotify_menu">SpotifyMenuActivity</string>
+    <string name="title_activity_spotify_search">Spotify Search</string>
     <string name="search_terms">Search Terms</string>
     <string name="search_in">Search In:</string>
     <string name="albums">Albums</string>

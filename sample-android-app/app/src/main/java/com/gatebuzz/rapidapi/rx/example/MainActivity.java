@@ -5,7 +5,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 
 import com.gatebuzz.rapidapi.rx.FailedCallException;
-import com.gatebuzz.rapidapi.rx.example.spotify.SpotifyMenuActivity;
+import com.gatebuzz.rapidapi.rx.example.spotify.SpotifySearchActivity;
 import com.jakewharton.rxbinding.view.RxView;
 
 import java.util.Map;
@@ -31,7 +31,7 @@ public class MainActivity extends ManagedSubscriptionsActivity {
     protected void onResume() {
         super.onResume();
         subscriptions.addAll(
-                RxView.clicks(findViewById(R.id.spotify)).subscribe(aVoid -> SpotifyMenuActivity.launch(MainActivity.this)),
+                RxView.clicks(findViewById(R.id.spotify)).subscribe(aVoid -> SpotifySearchActivity.launch(MainActivity.this)),
                 RxView.clicks(findViewById(R.id.fab)).subscribe(x -> tryTheApi())
         );
     }

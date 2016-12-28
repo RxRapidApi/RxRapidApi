@@ -22,9 +22,10 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".spotify.SpotifyMenuActivity"
-            android:label="@string/title_activity_spotify_menu"
+            android:name=".spotify.SpotifySearchActivity"
+            android:label="@string/title_activity_spotify_search"
             android:parentActivityName=".MainActivity"
+            android:windowSoftInputMode="adjustResize"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
