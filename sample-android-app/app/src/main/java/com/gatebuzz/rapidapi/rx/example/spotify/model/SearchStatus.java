@@ -5,7 +5,7 @@ public class SearchStatus {
     public static final int SKIPPED = 1;
     public static final int STARTED = 2;
     public static final int FINISHED = 3;
-    
+
     public int albums;
     public int artists;
     public int playlists;
@@ -28,18 +28,28 @@ public class SearchStatus {
     }
 
     public void finishArtists() {
-        albums = FINISHED;
+        artists = FINISHED;
     }
 
     public void finishPlaylists() {
-        albums = FINISHED;
+        playlists = FINISHED;
     }
 
     public void finishTracks() {
-        albums = FINISHED;
+        tracks = FINISHED;
     }
 
     public boolean isRunning() {
-        return albums+artists+playlists+tracks > 0;
+        return albums + artists + playlists + tracks > 0;
+    }
+
+    @Override
+    public String toString() {
+        return "SearchStatus{" +
+                "albums=" + albums +
+                ", artists=" + artists +
+                ", playlists=" + playlists +
+                ", tracks=" + tracks +
+                '}';
     }
 }

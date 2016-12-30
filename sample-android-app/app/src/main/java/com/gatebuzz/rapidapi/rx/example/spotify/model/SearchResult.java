@@ -5,10 +5,10 @@ import android.util.Log;
 import java.util.List;
 
 public class SearchResult {
-    final List<Album> albumResult;
-    final List<Artist> artistResult;
-    final List<Playlist> playlistResult;
-    final List<Track> trackResult;
+    private final List<Album> albumResult;
+    private final List<Artist> artistResult;
+    private final List<Playlist> playlistResult;
+    private final List<Track> trackResult;
 
     public SearchResult(List<Album> albumResult, List<Artist> artistResult, List<Playlist> playlistResult, List<Track> trackResult) {
         this.albumResult = albumResult;
