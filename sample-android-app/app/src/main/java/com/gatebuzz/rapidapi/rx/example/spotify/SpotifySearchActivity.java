@@ -6,15 +6,25 @@ import android.os.Bundle;
 import android.support.design.widget.TextInputEditText;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.CheckBox;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.ViewFlipper;
 
+import com.bumptech.glide.Glide;
 import com.gatebuzz.rapidapi.rx.example.ExampleApplication;
 import com.gatebuzz.rapidapi.rx.example.ManagedSubscriptionsActivity;
 import com.gatebuzz.rapidapi.rx.example.R;
+import com.gatebuzz.rapidapi.rx.example.spotify.model.Album;
+import com.gatebuzz.rapidapi.rx.example.spotify.model.Artist;
+import com.gatebuzz.rapidapi.rx.example.spotify.model.Image;
+import com.gatebuzz.rapidapi.rx.example.spotify.model.Playlist;
 import com.gatebuzz.rapidapi.rx.example.spotify.model.SearchResult;
 import com.gatebuzz.rapidapi.rx.example.spotify.model.SearchStatus;
+import com.gatebuzz.rapidapi.rx.example.spotify.model.Track;
 import com.jakewharton.rxbinding.view.RxView;
 
 import rx.android.schedulers.AndroidSchedulers;
@@ -49,11 +59,92 @@ public class SpotifySearchActivity extends ManagedSubscriptionsActivity {
     }
 
     private void displayResults(SearchResult searchResult) {
+        LayoutInflater layoutInflater = LayoutInflater.from(this);
+
+        LinearLayout container = (LinearLayout) findViewById(R.id.top_results);
+        container.removeAllViews();
+
+        if (!searchResult.albums.isEmpty()) {
+            addTitle(layoutInflater, container, R.string.albums);
+            int size = searchResult.albums.size();
+            for (int i = 0; i < 3 && i < size; i++) {
+                Album album = searchResult.albums.get(i);
+                addRow(layoutInflater, container, album.name, album.artists.isEmpty(), album.artists.isEmpty() ? "" : album.artists.get(0).name, album.smallestImage());
+            }
+            if (size > 3) {
+                addMore(layoutInflater, container);
+            }
+        }
+
+        if (!searchResult.artists.isEmpty()) {
+            addTitle(layoutInflater, container, R.string.artists);
+            int size = searchResult.artists.size();
+            for (int i = 0; i < 3 && i < size; i++) {
+                Artist artist = searchResult.artists.get(i);
+                addRow(layoutInflater, container, artist.name, true, "", artist.smallestImage());
+            }
+            if (size > 3) {
+                addMore(layoutInflater, container);
+            }
+        }
+
+        if (!searchResult.playlists.isEmpty()) {
+            addTitle(layoutInflater, container, R.string.playlists);
+            int size = searchResult.playlists.size();
+            for (int i = 0; i < 3 && i < size; i++) {
+                Playlist playlist = searchResult.playlists.get(i);
+                addRow(layoutInflater, container, playlist.name, true, "", playlist.smallestImage());
+            }
+            if (size > 3) {
+                addMore(layoutInflater, container);
+            }
+        }
+
+        if (!searchResult.tracks.isEmpty()) {
+            addTitle(layoutInflater, container, R.string.tracks);
+            int size = searchResult.tracks.size();
+            for (int i = 0; i < 3 && i < size; i++) {
+                Track track = searchResult.tracks.get(i);
+                addRow(layoutInflater, container, track.name, track.artists.isEmpty(), track.artists.isEmpty() ? "" : track.artists.get(0).name, track.smallestImage());
+            }
+            if (size > 3) {
+                addMore(layoutInflater, container);
+            }
+        }
+    }
+
+    private void addRow(LayoutInflater layoutInflater, LinearLayout container, String lineOneText, boolean lineTwoEmpty, String lineTwoText, Image smallest) {
+        View row = layoutInflater.inflate(R.layout.search_result, container, false);
+        TextView line1 = (TextView) row.findViewById(R.id.line_one);
+        line1.setText(lineOneText);
+        TextView line2 = (TextView) row.findViewById(R.id.line_two);
+        line2.setVisibility(lineTwoEmpty ? View.INVISIBLE : View.VISIBLE);
+        if (!lineTwoEmpty) {
+            line2.setText(lineTwoText);
+        }
+        container.addView(row, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+
+        if (smallest != null) {
+            Glide.with(this).load(smallest.url).into((ImageView) row.findViewById(R.id.result_image));
+        }
+    }
+
+    private void addMore(LayoutInflater layoutInflater, LinearLayout container) {
+        container.addView(layoutInflater.inflate(R.layout.search_more, container, false),
+                new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT));
+    }
+
+    private void addTitle(LayoutInflater layoutInflater, LinearLayout container, int titleTextId) {
+        View title = layoutInflater.inflate(R.layout.search_title, container, false);
+        ((TextView) title.findViewById(R.id.line_one)).setText(titleTextId);
+        container.addView(title, new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT));
     }
 
     private void displayStatus(SearchStatus searchStatus) {
-        Log.e("Example", "Status updated: "+searchStatus);
-
         showSpinner(searchStatus.albums, R.id.album_progress, R.id.album_progress_icon, R.id.album_progress_spinner);
         showSpinner(searchStatus.artists, R.id.artists_progress, R.id.artists_progress_icon, R.id.artists_progress_spinner);
         showSpinner(searchStatus.playlists, R.id.playlists_progress, R.id.playlists_progress_icon, R.id.playlists_progress_spinner);

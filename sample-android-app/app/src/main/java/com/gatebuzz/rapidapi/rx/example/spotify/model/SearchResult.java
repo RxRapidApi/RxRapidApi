@@ -1,21 +1,22 @@
 package com.gatebuzz.rapidapi.rx.example.spotify.model;
 
-import android.util.Log;
-
+import java.util.Collections;
 import java.util.List;
 
 public class SearchResult {
-    private final List<Album> albumResult;
-    private final List<Artist> artistResult;
-    private final List<Playlist> playlistResult;
-    private final List<Track> trackResult;
+    public final List<Album> albums;
+    public final List<Artist> artists;
+    public final List<Playlist> playlists;
+    public final List<Track> tracks;
 
-    public SearchResult(List<Album> albumResult, List<Artist> artistResult, List<Playlist> playlistResult, List<Track> trackResult) {
-        this.albumResult = albumResult;
-        this.artistResult = artistResult;
-        this.playlistResult = playlistResult;
-        this.trackResult = trackResult;
+    public SearchResult() {
+        this(Collections.emptyList(), Collections.emptyList(), Collections.emptyList(), Collections.emptyList());
+    }
 
-        Log.e("Example", "### Result: thread name=" + Thread.currentThread().getName() + " - id=" + Thread.currentThread().getId());
+    public SearchResult(List<Album> albums, List<Artist> artists, List<Playlist> playlists, List<Track> tracks) {
+        this.albums = albums != null ? albums : Collections.emptyList();
+        this.artists = artists != null ? artists : Collections.emptyList();
+        this.playlists = playlists != null ? playlists : Collections.emptyList();
+        this.tracks = tracks != null ? tracks : Collections.emptyList();
     }
 }

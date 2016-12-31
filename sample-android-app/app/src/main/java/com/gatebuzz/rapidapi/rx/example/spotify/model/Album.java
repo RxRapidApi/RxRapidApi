@@ -1,11 +1,11 @@
 package com.gatebuzz.rapidapi.rx.example.spotify.model;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.util.List;
 
-public class Album {
-    public String id;
-    public String name;
+public class Album extends BaseSearchResult {
     public List<Artist> artists;
+    @SerializedName("available_markets")
     public List<String> markets;
-    public List<Image> images;
 }
