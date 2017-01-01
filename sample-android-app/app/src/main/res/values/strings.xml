@@ -9,5 +9,6 @@
     <string name="artists">Artists</string>
     <string name="playlists">Playlists</string>
     <string name="tracks">Tracks</string>
-    <string name="more">(more...)</string>
+    <string name="more">(more…)</string>
+    <string name="title_activity_results">ResultsActivity</string>
 </resources>

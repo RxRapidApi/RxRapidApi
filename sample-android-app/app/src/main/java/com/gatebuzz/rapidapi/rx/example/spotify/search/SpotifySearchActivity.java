@@ -27,6 +27,7 @@ import com.gatebuzz.rapidapi.rx.example.spotify.search.model.Track;
 import com.jakewharton.rxbinding.view.RxView;
 
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
 
 public class SpotifySearchActivity extends ManagedSubscriptionsActivity {
 
@@ -71,7 +72,7 @@ public class SpotifySearchActivity extends ManagedSubscriptionsActivity {
                 addRow(layoutInflater, container, album.name, album.artists.isEmpty(), album.artists.isEmpty() ? "" : album.artists.get(0).name, album.smallestImage());
             }
             if (size > 3) {
-                addMore(layoutInflater, container);
+                addMore(layoutInflater, container, ResultsActivity.ALBUMS);
             }
         }
 
@@ -83,7 +84,7 @@ public class SpotifySearchActivity extends ManagedSubscriptionsActivity {
                 addRow(layoutInflater, container, artist.name, true, "", artist.smallestImage());
             }
             if (size > 3) {
-                addMore(layoutInflater, container);
+                addMore(layoutInflater, container, ResultsActivity.ARTISTS);
             }
         }
 
@@ -95,7 +96,7 @@ public class SpotifySearchActivity extends ManagedSubscriptionsActivity {
                 addRow(layoutInflater, container, playlist.name, true, "", playlist.smallestImage());
             }
             if (size > 3) {
-                addMore(layoutInflater, container);
+                addMore(layoutInflater, container, ResultsActivity.PLAYLISTS);
             }
         }
 
@@ -107,7 +108,7 @@ public class SpotifySearchActivity extends ManagedSubscriptionsActivity {
                 addRow(layoutInflater, container, track.name, track.artists.isEmpty(), track.artists.isEmpty() ? "" : track.artists.get(0).name, track.smallestImage());
             }
             if (size > 3) {
-                addMore(layoutInflater, container);
+                addMore(layoutInflater, container, ResultsActivity.TRACKS);
             }
         }
     }
@@ -128,11 +129,10 @@ public class SpotifySearchActivity extends ManagedSubscriptionsActivity {
         }
     }
 
-    private void addMore(LayoutInflater layoutInflater, LinearLayout container) {
-        container.addView(layoutInflater.inflate(R.layout.search_more, container, false),
-                new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT));
+    private void addMore(LayoutInflater layoutInflater, LinearLayout container, @ResultsActivity.SearchType int searchType) {
+        View moreView = layoutInflater.inflate(R.layout.search_more, container, false);
+        subscriptions.add(RxView.clicks(moreView).subscribe(v -> ResultsActivity.launch(SpotifySearchActivity.this, searchType)));
+        container.addView(moreView, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
     }
 
     private void addTitle(LayoutInflater layoutInflater, LinearLayout container, int titleTextId) {

@@ -25,11 +25,20 @@
             android:name=".spotify.search.SpotifySearchActivity"
             android:label="@string/title_activity_spotify_search"
             android:parentActivityName=".MainActivity"
-            android:windowSoftInputMode="adjustResize"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustResize">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.gatebuzz.rapidapi.rx.example.MainActivity" />
+        </activity>
+        <activity
+            android:name=".spotify.search.ResultsActivity"
+            android:label="@string/title_activity_results"
+            android:parentActivityName=".spotify.search.SpotifySearchActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.gatebuzz.rapidapi.rx.example.spotify.search.SpotifySearchActivity" />
         </activity>
     </application>
 

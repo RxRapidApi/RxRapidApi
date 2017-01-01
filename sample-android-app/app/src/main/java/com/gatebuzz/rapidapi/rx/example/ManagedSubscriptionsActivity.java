@@ -17,6 +17,7 @@ public abstract class ManagedSubscriptionsActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         subscriptions.unsubscribe();
+        subscriptions = null;
         super.onPause();
     }
 }

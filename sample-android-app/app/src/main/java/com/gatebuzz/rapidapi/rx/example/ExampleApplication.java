@@ -9,6 +9,8 @@ import com.gatebuzz.rapidapi.rx.example.spotify.search.SearchEngine;
 import com.gatebuzz.rapidapi.rx.example.spotify.search.SpotifySearchApi;
 import com.gatebuzz.rapidapi.rx.example.zillow.ZillowApi;
 
+import java.util.concurrent.TimeUnit;
+
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 
@@ -37,7 +39,10 @@ public class ExampleApplication extends Application {
 
         RxRapidApiBuilder apiBuilder = new RxRapidApiBuilder()
                 .application(PROJECT, BuildConfig.API_KEY)
-                .okHttpClient(new OkHttpClient.Builder().addInterceptor(interceptor).build());
+                .okHttpClient(new OkHttpClient.Builder()
+                        .connectTimeout(30, TimeUnit.SECONDS)
+                        .readTimeout(30, TimeUnit.SECONDS)
+                        .addInterceptor(interceptor).build());
 
         // Pass a default Zillow Web Service Id parameter to every method
         zillowApi = apiBuilder

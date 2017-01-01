@@ -37,6 +37,10 @@ public class SearchEngine {
         return resultsSubject;
     }
 
+    public SearchResult getSearchResult() {
+        return currentSearchResult;
+    }
+
     private void clearStatus() {
         currentSearchStatus = new SearchStatus();
         statusSubject.onNext(currentSearchStatus);
