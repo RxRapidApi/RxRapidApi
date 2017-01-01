@@ -15,7 +15,7 @@ import rx.Observable;
 @ApiPackage("SpotifyPublicAPI")
 public interface SpotifySearchApi {
 
-    //region Quick searches
+    //region Type-safe searches skipping the optional parameters
     Observable<Albums> searchAlbums(@Required @Named("query") String query);
 
     Observable<Artists> searchArtists(@Required @Named("query") String query);

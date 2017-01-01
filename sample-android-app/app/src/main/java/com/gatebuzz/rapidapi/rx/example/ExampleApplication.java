@@ -3,18 +3,23 @@ package com.gatebuzz.rapidapi.rx.example;
 import android.app.Application;
 
 import com.gatebuzz.rapidapi.rx.RxRapidApiBuilder;
+import com.gatebuzz.rapidapi.rx.example.hackernews.HackerNewsApi;
+import com.gatebuzz.rapidapi.rx.example.nasa.NasaApi;
 import com.gatebuzz.rapidapi.rx.example.spotify.search.SearchEngine;
 import com.gatebuzz.rapidapi.rx.example.spotify.search.SpotifySearchApi;
+import com.gatebuzz.rapidapi.rx.example.zillow.ZillowApi;
 
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 
 import static com.gatebuzz.rapidapi.rx.example.BuildConfig.API_KEY;
+import static com.gatebuzz.rapidapi.rx.example.BuildConfig.NASA_API_KEY;
 import static com.gatebuzz.rapidapi.rx.example.BuildConfig.PROJECT;
 import static com.gatebuzz.rapidapi.rx.example.BuildConfig.ZILLOW_API_KEY;
 
 public class ExampleApplication extends Application {
-    private static final String SPOTIFY_PUBLIC_API = "SpotifyPublicAPI";
+    public static final String ZWS_ID = "zwsId";
+    public static final String API_KEY = "apiKey";
 
     private NasaApi nasaApi;
     private ZillowApi zillowApi;
@@ -24,29 +29,37 @@ public class ExampleApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        // Define the builder once, so that underlying OkHttp / gson can be shared across all
-        // api services.
+        // Define the builder once, so that underlying OkHttp / Gson can be shared across all
+        // api services.  Note: this is work you would normally do in your dependency injection
+        // modules, declaring the dependencies as singletons.
         HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
         interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
 
         RxRapidApiBuilder apiBuilder = new RxRapidApiBuilder()
-                .application(PROJECT, API_KEY)
+                .application(PROJECT, BuildConfig.API_KEY)
                 .okHttpClient(new OkHttpClient.Builder().addInterceptor(interceptor).build());
 
         // Pass a default Zillow Web Service Id parameter to every method
         zillowApi = apiBuilder
-                .defaultValue("zwsId", ZILLOW_API_KEY)
+                .defaultValue(ZWS_ID, ZILLOW_API_KEY)
                 .endpoint(ZillowApi.class)
                 .build();
 
-        // ApiPackage at the class level to avoid noise
-        nasaApi = apiBuilder.endpoint(NasaApi.class).build();
+        // Pass a default api token parameter to every method
+        nasaApi = apiBuilder
+                .defaultValue(API_KEY, NASA_API_KEY)
+                .endpoint(NasaApi.class)
+                .build();
 
-        // Builder supplied project/key for an interface that could be shared
-        hackerNewsApi = apiBuilder.endpoint(HackerNewsApi.class).build();
+        // No api keys needed
+        hackerNewsApi = apiBuilder
+                .endpoint(HackerNewsApi.class)
+                .build();
 
-        // Application & ApiPackage can be specified by the builder overriding the annotations
-        spotifySearchEngine = new SearchEngine(apiBuilder.endpoint(SpotifySearchApi.class).apiPackage(SPOTIFY_PUBLIC_API).build());
+        // Wrap the api in the search engine that uses it
+        spotifySearchEngine = new SearchEngine(apiBuilder
+                .endpoint(SpotifySearchApi.class)
+                .build());
     }
 
     public NasaApi getNasaApi() {

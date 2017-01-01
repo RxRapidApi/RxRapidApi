@@ -6,6 +6,7 @@ import android.util.Log;
 
 import com.gatebuzz.rapidapi.rx.FailedCallException;
 import com.gatebuzz.rapidapi.rx.example.spotify.search.SpotifySearchActivity;
+import com.gatebuzz.rapidapi.rx.example.zillow.ZillowApi;
 import com.jakewharton.rxbinding.view.RxView;
 
 import java.util.Map;
@@ -39,7 +40,7 @@ public class MainActivity extends ManagedSubscriptionsActivity {
     private void tryTheApi() {
         ZillowApi zillowApi = ((ExampleApplication) getApplication()).getZillowApi();
 
-        Observable<Map<String, Object>> foo = zillowApi.getDeepSearchResults("", "2039 Yale Avenue", "63143");
+        Observable<Map<String, Object>> foo = zillowApi.getDeepSearchResults("2039 Yale Avenue", "63143", false);
 
         foo.subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
