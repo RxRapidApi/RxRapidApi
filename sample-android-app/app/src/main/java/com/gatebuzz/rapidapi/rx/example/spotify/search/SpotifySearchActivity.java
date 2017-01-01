@@ -1,11 +1,10 @@
-package com.gatebuzz.rapidapi.rx.example.spotify;
+package com.gatebuzz.rapidapi.rx.example.spotify.search;
 
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TextInputEditText;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.CheckBox;
@@ -18,13 +17,13 @@ import com.bumptech.glide.Glide;
 import com.gatebuzz.rapidapi.rx.example.ExampleApplication;
 import com.gatebuzz.rapidapi.rx.example.ManagedSubscriptionsActivity;
 import com.gatebuzz.rapidapi.rx.example.R;
-import com.gatebuzz.rapidapi.rx.example.spotify.model.Album;
-import com.gatebuzz.rapidapi.rx.example.spotify.model.Artist;
-import com.gatebuzz.rapidapi.rx.example.spotify.model.Image;
-import com.gatebuzz.rapidapi.rx.example.spotify.model.Playlist;
-import com.gatebuzz.rapidapi.rx.example.spotify.model.SearchResult;
-import com.gatebuzz.rapidapi.rx.example.spotify.model.SearchStatus;
-import com.gatebuzz.rapidapi.rx.example.spotify.model.Track;
+import com.gatebuzz.rapidapi.rx.example.spotify.search.model.Album;
+import com.gatebuzz.rapidapi.rx.example.spotify.search.model.Artist;
+import com.gatebuzz.rapidapi.rx.example.spotify.search.model.Image;
+import com.gatebuzz.rapidapi.rx.example.spotify.search.model.Playlist;
+import com.gatebuzz.rapidapi.rx.example.spotify.search.model.SearchResult;
+import com.gatebuzz.rapidapi.rx.example.spotify.search.model.SearchStatus;
+import com.gatebuzz.rapidapi.rx.example.spotify.search.model.Track;
 import com.jakewharton.rxbinding.view.RxView;
 
 import rx.android.schedulers.AndroidSchedulers;

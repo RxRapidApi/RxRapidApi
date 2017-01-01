@@ -1,4 +1,4 @@
-package com.gatebuzz.rapidapi.rx.example.spotify.model;
+package com.gatebuzz.rapidapi.rx.example.spotify.search.model;
 
 import com.google.gson.annotations.SerializedName;
 

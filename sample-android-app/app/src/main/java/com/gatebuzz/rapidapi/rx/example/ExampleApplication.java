@@ -3,8 +3,8 @@ package com.gatebuzz.rapidapi.rx.example;
 import android.app.Application;
 
 import com.gatebuzz.rapidapi.rx.RxRapidApiBuilder;
-import com.gatebuzz.rapidapi.rx.example.spotify.SearchEngine;
-import com.gatebuzz.rapidapi.rx.example.spotify.SpotifyApi;
+import com.gatebuzz.rapidapi.rx.example.spotify.search.SearchEngine;
+import com.gatebuzz.rapidapi.rx.example.spotify.search.SpotifySearchApi;
 
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -46,7 +46,7 @@ public class ExampleApplication extends Application {
         hackerNewsApi = apiBuilder.endpoint(HackerNewsApi.class).build();
 
         // Application & ApiPackage can be specified by the builder overriding the annotations
-        spotifySearchEngine = new SearchEngine(apiBuilder.endpoint(SpotifyApi.class).apiPackage(SPOTIFY_PUBLIC_API).build());
+        spotifySearchEngine = new SearchEngine(apiBuilder.endpoint(SpotifySearchApi.class).apiPackage(SPOTIFY_PUBLIC_API).build());
     }
 
     public NasaApi getNasaApi() {

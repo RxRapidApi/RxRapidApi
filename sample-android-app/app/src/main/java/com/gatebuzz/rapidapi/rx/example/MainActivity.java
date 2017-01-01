@@ -5,7 +5,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 
 import com.gatebuzz.rapidapi.rx.FailedCallException;
-import com.gatebuzz.rapidapi.rx.example.spotify.SpotifySearchActivity;
+import com.gatebuzz.rapidapi.rx.example.spotify.search.SpotifySearchActivity;
 import com.jakewharton.rxbinding.view.RxView;
 
 import java.util.Map;

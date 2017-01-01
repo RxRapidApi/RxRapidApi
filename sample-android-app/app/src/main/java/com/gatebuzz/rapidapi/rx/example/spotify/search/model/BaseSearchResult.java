@@ -1,8 +1,8 @@
-package com.gatebuzz.rapidapi.rx.example.spotify.model;
+package com.gatebuzz.rapidapi.rx.example.spotify.search.model;
 
 import java.util.List;
 
-public class BaseSearchResult {
+class BaseSearchResult {
     public String id;
     public String name;
     public List<Image> images;
