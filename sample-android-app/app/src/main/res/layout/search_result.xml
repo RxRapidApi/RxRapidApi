@@ -30,6 +30,7 @@
                 android:id="@+id/line_one"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textSize="16sp"
                 android:textStyle="bold"
                 tools:text="Art Angels" />
 
@@ -37,6 +38,7 @@
                 android:id="@+id/line_two"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textSize="12sp"
                 tools:text="Grimes" />
         </LinearLayout>
     </LinearLayout>
