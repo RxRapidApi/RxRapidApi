@@ -40,6 +40,20 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.gatebuzz.rapidapi.rx.example.spotify.search.SpotifySearchActivity" />
         </activity>
+        <activity
+            android:name=".nasa.NasaActivity"
+            android:label="@string/title_nasa">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.gatebuzz.rapidapi.rx.example.MainActivity" />
+        </activity>
+        <activity
+            android:name=".hackernews.HackerNewsActivity"
+            android:label="@string/title_hacker_news">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.gatebuzz.rapidapi.rx.example.MainActivity" />
+        </activity>
     </application>
 
 </manifest>
