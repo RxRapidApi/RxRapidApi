@@ -7,7 +7,7 @@
 
 # Download
 
-RxRapidApi is available on *jcenter* via Gradle
+RxRapidApi is available from *jcenter* - via Gradle 
 ```
 compile 'com.gatebuzz:rxrapidapi:0.7.3'
 ```

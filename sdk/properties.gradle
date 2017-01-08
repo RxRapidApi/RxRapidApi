@@ -4,11 +4,11 @@ if (project.rootProject.file('local.properties').exists()) {
 }
 
 ext {
-    bintrayVersion = '0.7.3'
+    bintrayVersion = '0.7.5'
     bintrayGroup = 'com.gatebuzz'
     bintrayArtifact = 'rxrapidapi'
-    releaseTag = 'v_0_7_3'
-    releaseDescription = 'Removed hard-coded config'
+    releaseTag = 'v_0_7_5'
+    releaseDescription = 'Custom return types driven from service interface.'
     bintrayUser = properties.getProperty('bintray.user.name')
     bintrayApiKey = properties.getProperty('bintray.api.key')
 

@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.gatebuzz.rapidapi.rx.example">
+    package="com.gatebuzz.rapidapi.rx.example">
 
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
+        android:name=".ExampleApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -19,6 +20,39 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name=".spotify.search.SpotifySearchActivity"
+            android:label="@string/title_activity_spotify_search"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustResize">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.gatebuzz.rapidapi.rx.example.MainActivity" />
+        </activity>
+        <activity
+            android:name=".spotify.search.ResultsActivity"
+            android:label="@string/title_activity_results"
+            android:parentActivityName=".spotify.search.SpotifySearchActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.gatebuzz.rapidapi.rx.example.spotify.search.SpotifySearchActivity" />
+        </activity>
+        <activity
+            android:name=".nasa.NasaActivity"
+            android:label="@string/title_nasa">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.gatebuzz.rapidapi.rx.example.MainActivity" />
+        </activity>
+        <activity
+            android:name=".hackernews.HackerNewsActivity"
+            android:label="@string/title_hacker_news">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.gatebuzz.rapidapi.rx.example.MainActivity" />
         </activity>
     </application>
 

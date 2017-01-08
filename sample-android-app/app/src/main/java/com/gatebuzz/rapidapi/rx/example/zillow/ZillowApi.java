@@ -1,8 +1,9 @@
-package com.gatebuzz.rapidapi.rx.example;
+package com.gatebuzz.rapidapi.rx.example.zillow;
 
 import com.gatebuzz.rapidapi.rx.ApiPackage;
 import com.gatebuzz.rapidapi.rx.DefaultParameters;
 import com.gatebuzz.rapidapi.rx.Named;
+import com.gatebuzz.rapidapi.rx.Required;
 import com.gatebuzz.rapidapi.rx.UrlEncoded;
 
 import java.util.Map;
@@ -15,43 +16,43 @@ public interface ZillowApi {
 
     Observable<Map<String, Object>> getZestimate(
             @Named("zpid") String propertyId,
-            @Named("rentzestimate") String rentEstimate
+            @Named("rentzestimate") Boolean rentEstimate
     );
 
     Observable<Map<String, Object>> getSearchResults(
-            @Named("rentzestimate") String rentEstimate,
-            @Named("address") @UrlEncoded String address,
-            @Named("citystatezip") String cityStateZip
+            @Required @Named("address") @UrlEncoded String address,
+            @Required @Named("citystatezip") @UrlEncoded String cityStateZip,
+            @Named("rentzestimate") Boolean rentEstimate
     );
 
     Observable<Map<String, Object>> getChart(
-            @Named("zpid") String propertyId,
-            @Named("unitType") String unitType,
-            @Named("width") String width,
-            @Named("height") String height,
+            @Required @Named("zpid") String propertyId,
+            @Required @Named("unitType") String unitType,
+            @Named("width") Integer width,
+            @Named("height") Integer height,
             @Named("chartDuration") String chartDuration
     );
 
     Observable<Map<String, Object>> getComps(
-            @Named("zpid") String propertyId,
-            @Named("count") String count,
-            @Named("rentzestimate") String rentEstimate
+            @Required @Named("zpid") String propertyId,
+            @Required @Named("count") String count,
+            @Named("rentzestimate") Boolean rentEstimate
     );
 
     Observable<Map<String, Object>> getDeepComps(
-            @Named("zpid") String propertyId,
-            @Named("count") String count,
-            @Named("rentzestimate") String rentEstimate
+            @Required @Named("zpid") String propertyId,
+            @Required @Named("count") String count,
+            @Named("rentzestimate") Boolean rentEstimate
     );
 
     Observable<Map<String, Object>> getDeepSearchResults(
-            @Named("rentzestimate") String rentEstimate,
-            @Named("address") @UrlEncoded String address,
-            @Named("citystatezip") String cityStateZip
+            @Required @Named("address") @UrlEncoded String address,
+            @Required @Named("citystatezip") @UrlEncoded String cityStateZip,
+            @Named("rentzestimate") Boolean rentEstimate
     );
 
     Observable<Map<String, Object>> getUpdatedPropertyDetails(
-            @Named("zpid") String propertyId
+            @Required @Named("zpid") String propertyId
     );
 
     Observable<Map<String, Object>> getRegionChildren(
@@ -67,7 +68,7 @@ public interface ZillowApi {
     );
 
     Observable<Map<String, Object>> getMonthlyPayments(
-            @Named("price") String price,
+            @Required @Named("price") String price,
             @Named("down") String down,
             @Named("dollarsdown") String dollarsDown,
             @Named("zip") String zip
