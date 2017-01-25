@@ -122,7 +122,9 @@ public class SpotifySearchActivity extends ManagedSubscriptionsActivity {
         if (!lineTwoEmpty) {
             line2.setText(lineTwoText);
         }
-        container.addView(row, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        params.setMargins(0, 0, 0, 32);
+        container.addView(row, params);
 
         if (smallest != null) {
             Glide.with(this).load(smallest.url).into((ImageView) row.findViewById(R.id.result_image));
