@@ -3,7 +3,7 @@
 ![Version](https://img.shields.io/badge/version-0.7.5-blue.svg?style=plastic)
 [![Stories in Ready](https://badge.waffle.io/psh/RxRapidApi.png?label=ready&title=Ready)](https://waffle.io/psh/RxRapidApi)
 
-[RapidApi](https://www.rapidapi.com/) with a sprinkle of [RxJava](https://github.com/ReactiveX/RxJava) and just a touch of [Retrofit](https://github.com/square/retrofit) inspired syntax.
+[RxRapidApi](https://github.com/psh/RxRapidApi) is a [Rapid Api](https://www.rapidapi.com/) client sdk that provides a type-safe, [RxJava](https://github.com/ReactiveX/RxJava) powered interface to Rapid API services.
 
 # Download
 
