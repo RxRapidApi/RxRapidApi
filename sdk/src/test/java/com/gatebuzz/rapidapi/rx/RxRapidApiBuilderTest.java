@@ -424,6 +424,25 @@ public class RxRapidApiBuilderTest {
     }
 
     @Test
+    public void missingParameterizedTypeForSingle() {
+        try {
+            new RxRapidApiBuilder().endpoint(MissingParameterizedTypeInterfaceSingle.class).build();
+            fail("Exception expected");
+        } catch (IllegalArgumentException e) {
+            assertEquals("Missing parameterized type on someMethod().", e.getMessage());
+        }
+    }
+    @Test
+    public void missingParameterizedTypeForObservable() {
+        try {
+            new RxRapidApiBuilder().endpoint(MissingParameterizedTypeInterfaceObservable.class).build();
+            fail("Exception expected");
+        } catch (IllegalArgumentException e) {
+            assertEquals("Missing parameterized type on someMethod().", e.getMessage());
+        }
+    }
+
+    @Test
     public void annotationOnClass() {
         try {
             new RxRapidApiBuilder().endpoint(ApiPackageOnClass.class).build();
@@ -558,6 +577,18 @@ public class RxRapidApiBuilderTest {
     //endregion
 
     //region Builder interfaces
+    @Application(project = "a", key = "b")
+    private interface MissingParameterizedTypeInterfaceObservable {
+        @ApiPackage("c")
+        Observable someMethod(@Named("d") String data);
+    }
+
+    @Application(project = "a", key = "b")
+    private interface MissingParameterizedTypeInterfaceSingle {
+        @ApiPackage("c")
+        Single someMethod(@Named("d") String data);
+    }
+
     @Application(project = "a", key = "b")
     @DefaultParameters("key")
     private interface SingleClassLevelDefaultBuilderTestClass {
