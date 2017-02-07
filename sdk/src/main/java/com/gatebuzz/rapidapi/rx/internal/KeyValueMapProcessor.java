@@ -11,6 +11,9 @@ import java.util.Map;
 /**
  * Process the payload part of the return envelope from RapidAPI and return it in a key/value map
  * with the key of "success" (matching the production SDK).
+ *
+ * @see com.gatebuzz.rapidapi.rx.utils.SuccessMapper
+ * @see com.gatebuzz.rapidapi.rx.utils.DrillDown
  */
 public class KeyValueMapProcessor implements ResponseProcessor {
     private static final Type MAP_STRING_TO_OBJECT = new TypeToken<Map<String, Object>>() {
