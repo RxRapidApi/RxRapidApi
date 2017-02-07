@@ -4,23 +4,26 @@ import com.gatebuzz.rapidapi.rx.ApiPackage;
 import com.gatebuzz.rapidapi.rx.Named;
 import com.gatebuzz.rapidapi.rx.Required;
 
+import java.util.List;
 import java.util.Map;
 
 import rx.Observable;
 
 @ApiPackage("HackerNews")
 public interface HackerNewsApi {
-    Observable<Map<String, Object>> getNewStories();
+    //region Lists of categorized item ids
+    Observable<List<Long>> getNewStories();
 
-    Observable<Map<String, Object>> getBestStories();
+    Observable<List<Long>> getBestStories();
 
-    Observable<Map<String, Object>> getAskStories();
+    Observable<List<Long>> getAskStories();
 
-    Observable<Map<String, Object>> getShowStories();
+    Observable<List<Long>> getShowStories();
 
-    Observable<Map<String, Object>> getJobStories();
+    Observable<List<Long>> getJobStories();
 
-    Observable<Map<String, Object>> getUpdates();
+    Observable<List<Long>> getUpdates();
+    // endregion
 
     Observable<Map<String, Object>> getUser(@Required @Named("username") String username);
 
