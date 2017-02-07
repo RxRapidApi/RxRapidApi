@@ -1,6 +1,6 @@
 # RxRapidApi
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg?style=plastic)](https://opensource.org/licenses/Apache-2.0) 
-![Version](https://img.shields.io/badge/version-0.7.3-blue.svg?style=plastic)
+![Version](https://img.shields.io/badge/version-0.7.5-blue.svg?style=plastic)
 [![Stories in Ready](https://badge.waffle.io/psh/RxRapidApi.png?label=ready&title=Ready)](https://waffle.io/psh/RxRapidApi)
 
 [RapidApi](https://www.rapidapi.com/) with a sprinkle of [RxJava](https://github.com/ReactiveX/RxJava) and just a touch of [Retrofit](https://github.com/square/retrofit) inspired syntax.
@@ -9,14 +9,14 @@
 
 RxRapidApi is available from *jcenter* - via Gradle 
 ```
-compile 'com.gatebuzz:rxrapidapi:0.7.3'
+compile 'com.gatebuzz:rxrapidapi:0.7.5'
 ```
 or maven
 ```xml
 <dependency>
   <groupId>com.gatebuzz</groupId>
   <artifactId>rxrapidapi</artifactId>
-  <version>0.7.3</version>
+  <version>0.7.5</version>
   <type>pom</type>
 </dependency>
 ```
