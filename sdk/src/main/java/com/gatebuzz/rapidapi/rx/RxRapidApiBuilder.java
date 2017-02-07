@@ -58,6 +58,7 @@ public class RxRapidApiBuilder {
 
     /**
      * Configure the server where Rapid API is deployed.
+     *
      * @param server the server where Rapid API is deployed
      * @return this builder
      */
@@ -68,6 +69,7 @@ public class RxRapidApiBuilder {
 
     /**
      * Configure the GSon parser used for service calls.
+     *
      * @param gson the parser to use
      * @return this builder
      */
@@ -78,6 +80,7 @@ public class RxRapidApiBuilder {
 
     /**
      * Configure the OkHttpClient used for service calls.
+     *
      * @param okHttpClient the client to use
      * @return this builder
      */
@@ -90,10 +93,10 @@ public class RxRapidApiBuilder {
      * Override the service interface <code>@Application</code> annotation to provide the
      * Rapid API <code>project</code> and <code>api key</code>.
      *
-     * @see Application
      * @param project the Rapid API <code>project</code>
-     * @param key the Rapid API <code>api key</code>
+     * @param key     the Rapid API <code>api key</code>
      * @return this builder
+     * @see Application
      */
     public RxRapidApiBuilder application(String project, String key) {
         this.project = project;
@@ -105,9 +108,9 @@ public class RxRapidApiBuilder {
      * Override the service interface <code>@ApiPackage</code> annotation to provide the
      * Rapid API package.
      *
-     * @see ApiPackage
      * @param apiPackage the Rapid API api package
      * @return this builder
+     * @see ApiPackage
      */
     public RxRapidApiBuilder apiPackage(String apiPackage) {
         this.apiPackage = apiPackage;
@@ -117,10 +120,9 @@ public class RxRapidApiBuilder {
     /**
      * Provide the value for a documented default parameter.
      *
-     * @param key the parameter name
+     * @param key   the parameter name
      * @param value the parameter value
      * @return this builder
-     *
      * @see DefaultParameters
      */
     public RxRapidApiBuilder defaultValue(String key, String value) {
@@ -133,10 +135,9 @@ public class RxRapidApiBuilder {
      * on the interface.
      *
      * @param method the scope for this default parameter value
-     * @param key the parameter name
-     * @param value the parameter value
+     * @param key    the parameter name
+     * @param value  the parameter value
      * @return this builder
-     *
      * @see DefaultParameters
      */
     public RxRapidApiBuilder defaultValue(String method, String key, String value) {
@@ -153,7 +154,6 @@ public class RxRapidApiBuilder {
      *
      * @param defaultValues map of key / value pairs containing the default parameter values.
      * @return this builder
-     *
      * @see DefaultParameters
      */
     public RxRapidApiBuilder defaultValues(HashMap<String, String> defaultValues) {
@@ -165,10 +165,9 @@ public class RxRapidApiBuilder {
      * Provide values for documented default parameters, bound to a particular service method
      * on the interface.
      *
-     * @param method the service method
+     * @param method        the service method
      * @param defaultValues map of key / value pairs containing the default parameter values.
      * @return this builder
-     *
      * @see DefaultParameters
      */
     public RxRapidApiBuilder defaultValues(String method, HashMap<String, String> defaultValues) {
@@ -195,15 +194,6 @@ public class RxRapidApiBuilder {
             ApiPackage methodApiPackageAnnotation = method.getAnnotation(ApiPackage.class);
             DefaultParameters methodDefaultParametersAnnotation = method.getAnnotation(DefaultParameters.class);
 
-            Type declaredReturnType = method.getGenericReturnType();
-            ResponseProcessor processor = KeyValueMapProcessor.success();
-            if (declaredReturnType instanceof ParameterizedType) {
-                Type[] typeArguments = ((ParameterizedType)declaredReturnType).getActualTypeArguments();
-                if (typeArguments != null && typeArguments.length > 0 && !MAP_STRING_TO_OBJECT.equals(typeArguments[0])) {
-                    processor = new CustomTypeResponseProcessor(typeArguments[0]);
-                }
-            }
-
             CallConfiguration configuration = CallConfigurationFactory.newInstance(
                     applicationAnnotation, methodAppAnnotation,
                     apiPackageAnnotation, methodApiPackageAnnotation,
@@ -211,11 +201,27 @@ public class RxRapidApiBuilder {
                     getMethodLevelDefaultsOrEmpty(method),
                     defaultParametersAnnotation, methodDefaultParametersAnnotation,
                     new CallConfiguration.Server(server, okHttpClient, gson),
-                    processor);
+                    configureResponseProcessor(method));
+
             callConfigurationMap.put(method.getName(), configuration);
         }
 
         return callHandlerFactory.newInstance(interfaceClass, callConfigurationMap);
+    }
+
+    private ResponseProcessor configureResponseProcessor(Method method) {
+        Type declaredReturnType = method.getGenericReturnType();
+        if (declaredReturnType instanceof ParameterizedType) {
+            Type[] typeArguments = ((ParameterizedType) declaredReturnType).getActualTypeArguments();
+            if (typeArguments != null && typeArguments.length > 0) {
+                if (MAP_STRING_TO_OBJECT.equals(typeArguments[0])) {
+                    return KeyValueMapProcessor.success();
+                } else {
+                    return new CustomTypeResponseProcessor(typeArguments[0]);
+                }
+            }
+        }
+        throw new IllegalArgumentException("Missing parameterized type on " + method.getName() + "().");
     }
 
     private Map<String, String> getMethodLevelDefaultsOrEmpty(Method method) {
