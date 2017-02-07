@@ -11,6 +11,7 @@ import rx.Observable;
 
 @ApiPackage("HackerNews")
 public interface HackerNewsApi {
+    //region Lists of categorized item ids
     Observable<List<Long>> getNewStories();
 
     Observable<List<Long>> getBestStories();
@@ -22,6 +23,7 @@ public interface HackerNewsApi {
     Observable<List<Long>> getJobStories();
 
     Observable<List<Long>> getUpdates();
+    // endregion
 
     Observable<Map<String, Object>> getUser(@Required @Named("username") String username);
 

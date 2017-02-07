@@ -21,7 +21,6 @@ import java.util.Map;
 
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
 public class HackerNewsActivity extends AppCompatActivity {
@@ -34,30 +33,23 @@ public class HackerNewsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_hacker_news);
+        loadTopFiveNewStories();
+    }
+
+    private void loadTopFiveNewStories() {
         HackerNewsApi api = ((ExampleApplication) getApplication()).getHackerNewsApi();
         api.getNewStories()
                 .subscribeOn(Schedulers.newThread())
-                .flatMap(new Func1<List<Long>, Observable<Long>>() {
-                    @Override
-                    public Observable<Long> call(List<Long> longs) {
-                        return Observable.from(longs);
-                    }
-                })
+                .flatMap(Observable::from)
                 .take(5)
-                .flatMap(new Func1<Long, Observable<Map<String, Object>>>() {
-                    @Override
-                    public Observable<Map<String, Object>> call(Long id) {
-                        return api.getItem(id);
-                    }
-                })
+                .flatMap(api::getItem)
                 .map(new SuccessMapper<Map<String, Object>>())
-                .map(m -> new Story((String) m.get("by"), (String) m.get("url"), (String) m.get("title"), ((Double) m.get("time")).longValue()))
                 .toList()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this::displayStories);
     }
 
-    private void displayStories(final List<Story> stories) {
+    private void displayStories(final List<Map<String, Object>> stories) {
         findViewById(R.id.progress).setVisibility(View.GONE);
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.results);
         recyclerView.setLayoutManager(new LinearLayoutManager(HackerNewsActivity.this));
@@ -80,19 +72,19 @@ public class HackerNewsActivity extends AppCompatActivity {
     }
 
     private class Holder extends SearchResultViewHolder {
-        public Holder(View itemView) {
+        Holder(View itemView) {
             super(itemView);
         }
 
-        public void bind(Story story) {
+        void bind(Map<String, Object> story) {
             image.setVisibility(View.GONE);
 
-            lineOne.setText(story.title);
-            lineTwo.setText(story.by);
+            lineOne.setText((String) story.get("title"));
+            lineTwo.setText((String) story.get("by"));
 
             itemView.setOnClickListener(v -> {
                 Intent i = new Intent(Intent.ACTION_VIEW);
-                i.setData(Uri.parse(story.url));
+                i.setData(Uri.parse((String) story.get("url")));
                 getApplicationContext().startActivity(i);
             });
         }
