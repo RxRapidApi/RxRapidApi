@@ -1,5 +1,8 @@
 package com.gatebuzz.rapidapi.rx;
 
+import com.gatebuzz.rapidapi.rx.internal.model.CallConfiguration;
+import com.gatebuzz.rapidapi.rx.internal.model.CallConfigurationFactory;
+import com.gatebuzz.rapidapi.rx.internal.model.Server;
 import com.gatebuzz.rapidapi.rx.internal.*;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -35,7 +38,7 @@ public class RxRapidApiBuilder {
             @Override
             public <T> T newInstance(Class<?> interfaceClass, Map<String, CallConfiguration> configurationMap) {
                 return (T) Proxy.newProxyInstance(interfaceClass.getClassLoader(),
-                        new Class[]{interfaceClass}, new CallHandler(configurationMap));
+                        new Class[]{interfaceClass}, new RapidApiInvocationHandler(configurationMap));
             }
         });
     }
@@ -150,7 +153,7 @@ public class RxRapidApiBuilder {
     }
 
     /**
-     * Provide values for documented default parameters.
+     * Provide values for documented default model.
      *
      * @param defaultValues map of key / value pairs containing the default parameter values.
      * @return this builder
@@ -162,7 +165,7 @@ public class RxRapidApiBuilder {
     }
 
     /**
-     * Provide values for documented default parameters, bound to a particular service method
+     * Provide values for documented default model, bound to a particular service method
      * on the interface.
      *
      * @param method        the service method
@@ -200,7 +203,7 @@ public class RxRapidApiBuilder {
                     method, project, key, apiPackage, classLevelDefaults,
                     getMethodLevelDefaultsOrEmpty(method),
                     defaultParametersAnnotation, methodDefaultParametersAnnotation,
-                    new CallConfiguration.Server(server, okHttpClient, gson),
+                    new Server(server, okHttpClient, gson),
                     configureResponseProcessor(method));
 
             callConfigurationMap.put(method.getName(), configuration);

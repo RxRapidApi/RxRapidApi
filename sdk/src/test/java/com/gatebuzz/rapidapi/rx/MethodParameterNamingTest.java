@@ -15,7 +15,7 @@ public class MethodParameterNamingTest {
             RxRapidApiBuilder.from(MethodParameterNameMissing.class);
             fail("Exception expected");
         } catch (IllegalArgumentException e) {
-            assertEquals("Incorrect number of @Named parameters on someMethod() - expecting 1, found 0.", e.getMessage());
+            assertEquals("Incorrect number of @Named model on someMethod() - expecting 1, found 0.", e.getMessage());
         }
     }
 

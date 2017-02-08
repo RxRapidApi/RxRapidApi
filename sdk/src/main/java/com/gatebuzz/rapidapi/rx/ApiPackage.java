@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Specify a Rapid API package to call.  Annotated at the class lewel, this
+ * Specify a Rapid API package to call.  Annotated at the class level, this
  * value is applied to every method in the service interface.  Method level
  * annotations will override the class level one.  Note: the builder's <code>apiPackage()</code>
  * method will override any annotations on the service interface.

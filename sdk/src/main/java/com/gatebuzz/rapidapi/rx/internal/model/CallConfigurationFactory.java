@@ -1,8 +1,7 @@
-package com.gatebuzz.rapidapi.rx.internal;
+package com.gatebuzz.rapidapi.rx.internal.model;
 
 import com.gatebuzz.rapidapi.rx.*;
-import com.gatebuzz.rapidapi.rx.internal.CallConfiguration.Parameter;
-import com.gatebuzz.rapidapi.rx.internal.CallConfiguration.Server;
+import com.gatebuzz.rapidapi.rx.internal.ResponseProcessor;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -43,14 +42,14 @@ public class CallConfigurationFactory {
                     method.getName() + "() " + "(check the @Named annotation on your interface method).");
         }
 
-        List<Parameter> parameters = collectAnnotatedParameters(method);
+        List<ParameterSpec> parameters = collectAnnotatedParameters(method);
         if (parameters.size() != method.getParameterTypes().length) {
-            throw new IllegalArgumentException("Incorrect number of @Named parameters on " +
+            throw new IllegalArgumentException("Incorrect number of @Named model on " +
                     method.getName() + "() - expecting " + method.getParameterTypes().length +
                     ", found " + parameters.size() + ".");
         }
 
-        List<Parameter> defaultValueNames = collectDefaultValueNames(classDefaults, methodDefaults);
+        List<ParameterSpec> defaultValueNames = collectDefaultValueNames(classDefaults, methodDefaults);
 
         return new CallConfiguration(server, resolvedProject, resolvedKey, resolvedApiPackage,
                 name, parameters, classLevelDefaults, methodLevelDefaults, defaultValueNames,
@@ -73,18 +72,18 @@ public class CallConfigurationFactory {
         }
     }
 
-    private static List<Parameter> collectDefaultValueNames(DefaultParameters classDefault, DefaultParameters methodDefault) {
-        List<Parameter> defaultValueNames = new ArrayList<>();
+    private static List<ParameterSpec> collectDefaultValueNames(DefaultParameters classDefault, DefaultParameters methodDefault) {
+        List<ParameterSpec> defaultValueNames = new ArrayList<>();
         defaultValueNames.addAll(getParameters(classDefault));
         defaultValueNames.addAll(getParameters(methodDefault));
         return defaultValueNames;
     }
 
-    private static List<Parameter> getParameters(DefaultParameters dp) {
+    private static List<ParameterSpec> getParameters(DefaultParameters dp) {
         String[] strings = dp != null ? dp.value() : EMPTY;
-        List<Parameter> list = new ArrayList<>();
+        List<ParameterSpec> list = new ArrayList<>();
         for (String s : strings) {
-            list.add(new Parameter(s));
+            list.add(new ParameterSpec(s));
         }
         return list;
     }
@@ -94,9 +93,9 @@ public class CallConfigurationFactory {
         return (methodNameAnnotation != null) ? methodNameAnnotation.value() : method.getName();
     }
 
-    private static List<Parameter> collectAnnotatedParameters(Method method) {
+    private static List<ParameterSpec> collectAnnotatedParameters(Method method) {
         Annotation[][] parameterAnnotations = method.getParameterAnnotations();
-        List<Parameter> parameters = new ArrayList<>();
+        List<ParameterSpec> parameters = new ArrayList<>();
         for (Annotation[] annotations : parameterAnnotations) {
             String name = null;
             boolean urlEncoded = false;
@@ -112,7 +111,7 @@ public class CallConfigurationFactory {
                 }
             }
             if (name != null) {
-                parameters.add(new Parameter(name, urlEncoded, required));
+                parameters.add(new ParameterSpec(name, urlEncoded, required));
             }
         }
         return parameters;

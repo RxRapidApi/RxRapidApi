@@ -1,6 +1,8 @@
 package com.gatebuzz.rapidapi.rx.internal;
 
 import com.gatebuzz.rapidapi.rx.FailedCallException;
+import com.gatebuzz.rapidapi.rx.internal.model.CallConfiguration;
+import com.gatebuzz.rapidapi.rx.internal.model.ParameterValue;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -10,12 +12,9 @@ import rx.Observable;
 import rx.Single;
 import rx.Subscriber;
 
-import java.io.File;
-import java.io.FileNotFoundException;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
-
-import static com.gatebuzz.rapidapi.rx.internal.Pair.TYPE_DATA;
 
 @SuppressWarnings("unchecked")
 class Engine<T> {
@@ -30,9 +29,9 @@ class Engine<T> {
     private static final ResponseProcessor ERROR_PROCESSOR = KeyValueMapProcessor.error();
 
     private final CallConfiguration callConfiguration;
-    private final Map<String, Pair<String, String>> body;
+    private final List<ParameterValue> body;
 
-    Engine(CallConfiguration callConfiguration, Map<String, Pair<String, String>> body) {
+    Engine(CallConfiguration callConfiguration, List<ParameterValue> body) {
         this.callConfiguration = callConfiguration;
         this.body = body;
     }
@@ -51,29 +50,39 @@ class Engine<T> {
         });
     }
 
-    private void executeCall(Subscriber<? super T> subscriber) {
+    private void executeCall(final Subscriber<? super T> subscriber) {
         try {
             Request request = new Request.Builder()
                     .url(String.format(URL_FORMAT, callConfiguration.server.serverUrl, callConfiguration.pack, callConfiguration.block))
                     .addHeader(USER_AGENT, USER_AGENT_VALUE)
                     .addHeader(AUTHORIZATION, Credentials.basic(callConfiguration.project, callConfiguration.key))
-                    .post(createMultipartBody()).build();
-
+                    .post(createMultipartBody())
+                    .build();
             Response response = callConfiguration.server.okHttpClient.newCall(request).execute();
-            Gson gson = callConfiguration.server.gson;
-            String string = response.body().string();
+
+            // So it looks like the server doesn't sent well-formed JSON back if the block isn't found.
+            // In that case, synthesize a return value that clients can understand, rather than a
+            // strange "JSON Parse Exception"
+            if (response.code() == 404) {
+                Map<String, Object> error = new HashMap<>();
+                error.put("error", callConfiguration.pack+"."+callConfiguration.block+" not found.");
+                subscriber.onError(new FailedCallException(error));
+                return;
+            }
+
+            String bodyString = response.body().string();
             JsonParser parser = new JsonParser();
-            JsonObject rootObject = parser.parse(string).getAsJsonObject();
+            JsonObject rootObject = parser.parse(bodyString).getAsJsonObject();
             JsonElement payloadElement = rootObject.get(PAYLOAD);
 
             if (response.code() != 200) {
-                sendErrorWithPayload(subscriber, gson, payloadElement);
+                sendErrorWithPayload(subscriber, callConfiguration.server.gson, payloadElement);
             } else {
                 String outcome = rootObject.get(OUTCOME).getAsString();
                 if (ERROR_OUTCOME.equals(outcome)) {
-                    sendErrorWithPayload(subscriber, gson, payloadElement);
+                    sendErrorWithPayload(subscriber, callConfiguration.server.gson, payloadElement);
                 } else {
-                    subscriber.onNext((T) callConfiguration.responseProcessor.process(gson, payloadElement));
+                    subscriber.onNext((T) callConfiguration.responseProcessor.process(callConfiguration.server.gson, payloadElement));
                     subscriber.onCompleted();
                 }
             }
@@ -87,29 +96,16 @@ class Engine<T> {
         subscriber.onError(new FailedCallException((Map<String, Object>) ERROR_PROCESSOR.process(gson, payloadElement)));
     }
 
-    private RequestBody createMultipartBody() throws FileNotFoundException {
+    private RequestBody createMultipartBody() {
         if (body.isEmpty()) {
             return EMPTY;
         }
 
-        MultipartBody.Builder builder = new MultipartBody.Builder()
-                .setType(MultipartBody.FORM);
-
-        Set<Map.Entry<String, Pair<String, String>>> entrySet = ((Map) body).entrySet();
-        for (Map.Entry<String, Pair<String, String>> entry : entrySet) {
-            Pair<String, String> argument = entry.getValue();
-            if (TYPE_DATA.equals(argument.first)) {
-                builder.addFormDataPart(entry.getKey(), argument.second);
-            } else {
-                File file = new File(argument.second);
-                if (file.exists() && file.isFile()) {
-                    builder.addFormDataPart(entry.getKey(), file.getName(), RequestBody.create(MultipartBody.FORM, file));
-                } else {
-                    throw new FileNotFoundException(argument.second);
-                }
-            }
+        MultipartBody.Builder builder = new MultipartBody.Builder().setType(MultipartBody.FORM);
+        for (ParameterValue entry : body) {
+            entry.visit(builder);
         }
+
         return builder.build();
     }
-
 }

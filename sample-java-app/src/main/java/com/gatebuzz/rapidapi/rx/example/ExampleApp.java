@@ -3,6 +3,8 @@ package com.gatebuzz.rapidapi.rx.example;
 import com.gatebuzz.rapidapi.rx.RxRapidApiBuilder;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.Map;
 
@@ -92,12 +94,16 @@ public class ExampleApp extends Application {
         fileChooser.setTitle("Open Upload File");
         File file = fileChooser.showOpenDialog(primaryStage);
         if (file != null) {
-            slackApi.uploadFile(file, null, file.getName(), null, null, null)
-                    .map(result -> (String)result.get("success"))
-                    .map(SlackFileResponse::fromJson)
-                    .map(sfr -> sfr.file)
-                    .doOnNext(System.out::println)
-                    .subscribe();
+            try {
+                slackApi.uploadFile(new FileInputStream(file), null, file.getName(), null, null, null)
+                        .map(result -> (String)result.get("success"))
+                        .map(SlackFileResponse::fromJson)
+                        .map(sfr -> sfr.file)
+                        .doOnNext(System.out::println)
+                        .subscribe();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
         }
     }
 

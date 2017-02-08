@@ -1,8 +1,8 @@
 package com.gatebuzz.rapidapi.rx;
 
-import com.gatebuzz.rapidapi.rx.internal.CallConfiguration;
-import com.gatebuzz.rapidapi.rx.internal.CallConfiguration.Parameter;
 import com.gatebuzz.rapidapi.rx.internal.CallHandlerFactory;
+import com.gatebuzz.rapidapi.rx.internal.model.CallConfiguration;
+import com.gatebuzz.rapidapi.rx.internal.model.ParameterSpec;
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 import okhttp3.OkHttpClient;
@@ -296,7 +296,7 @@ public class RxRapidApiBuilderTest {
                 .build();
         verify(callHandlerFactory).newInstance(eq(SingleClassLevelDefaultBuilderTestClass.class), captor.capture());
         CallConfiguration config = captor.getValue().get("someMethod");
-        assertEquals(Collections.singletonList(new Parameter("key")), config.defaultParameters);
+        assertEquals(Collections.singletonList(new ParameterSpec("key")), config.defaultParameters);
     }
 
     @Test
@@ -306,7 +306,7 @@ public class RxRapidApiBuilderTest {
                 .build();
         verify(callHandlerFactory).newInstance(eq(MultipleClassLevelDefaultBuilderTestClass.class), captor.capture());
         CallConfiguration config = captor.getValue().get("someMethod");
-        assertEquals(Arrays.asList(new Parameter("key1"), new Parameter("key2")), config.defaultParameters);
+        assertEquals(Arrays.asList(new ParameterSpec("key1"), new ParameterSpec("key2")), config.defaultParameters);
     }
 
     @Test
@@ -316,7 +316,7 @@ public class RxRapidApiBuilderTest {
                 .build();
         verify(callHandlerFactory).newInstance(eq(SingleMethodLevelDefaultBuilderTestClass.class), captor.capture());
         CallConfiguration config = captor.getValue().get("someMethod");
-        assertEquals(Collections.singletonList(new Parameter("key")), config.defaultParameters);
+        assertEquals(Collections.singletonList(new ParameterSpec("key")), config.defaultParameters);
     }
 
     @Test
@@ -326,7 +326,7 @@ public class RxRapidApiBuilderTest {
                 .build();
         verify(callHandlerFactory).newInstance(eq(MultipleMethodLevelDefaultBuilderTestClass.class), captor.capture());
         CallConfiguration config = captor.getValue().get("someMethod");
-        assertEquals(Arrays.asList(new Parameter("key1"), new Parameter("key2")), config.defaultParameters);
+        assertEquals(Arrays.asList(new ParameterSpec("key1"), new ParameterSpec("key2")), config.defaultParameters);
     }
 
     @Test
@@ -335,10 +335,10 @@ public class RxRapidApiBuilderTest {
                 .endpoint(MultipleDefaultNamesBuilderTestClass.class)
                 .build();
         verify(callHandlerFactory).newInstance(eq(MultipleDefaultNamesBuilderTestClass.class), captor.capture());
-        assertEquals(Arrays.asList(new Parameter("key1"), new Parameter("key2"),
-                new Parameter("key3"), new Parameter("key4")), captor.getValue().get("someMethod").defaultParameters);
-        assertEquals(Arrays.asList(new Parameter("key1"), new Parameter("key2"),
-                new Parameter("key5")), captor.getValue().get("someOtherMethod").defaultParameters);
+        assertEquals(Arrays.asList(new ParameterSpec("key1"), new ParameterSpec("key2"),
+                new ParameterSpec("key3"), new ParameterSpec("key4")), captor.getValue().get("someMethod").defaultParameters);
+        assertEquals(Arrays.asList(new ParameterSpec("key1"), new ParameterSpec("key2"),
+                new ParameterSpec("key5")), captor.getValue().get("someOtherMethod").defaultParameters);
     }
     //endregion
 

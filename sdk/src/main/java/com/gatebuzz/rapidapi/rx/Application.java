@@ -13,5 +13,6 @@ import java.lang.annotation.*;
 @Documented
 public @interface Application {
     String project();
+
     String key();
 }
