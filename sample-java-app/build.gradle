@@ -7,7 +7,7 @@ repositories {
 
 dependencies {
     // Depend on production version - other dependencies will be downloaded
-    // compile 'com.gatebuzz:rxrapidapi:0.7.4'
+    // compile 'com.gatebuzz:rxrapidapi:0.7.6'
 
     // Depend on local development version
     compile files('../sdk/build/libs/RxRapidApiSdk.jar')
