@@ -12,6 +12,7 @@ import rx.Observable;
 import rx.Single;
 import rx.Subscriber;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -29,7 +30,6 @@ class Engine<T> {
 
     private final CallConfiguration callConfiguration;
     private final List<ParameterValue> body;
-    private Subscriber<? super T> subscriber;
 
     Engine(CallConfiguration callConfiguration, List<ParameterValue> body) {
         this.callConfiguration = callConfiguration;
@@ -50,8 +50,7 @@ class Engine<T> {
         });
     }
 
-    private void executeCall(Subscriber<? super T> subscriber) {
-        this.subscriber = subscriber;
+    private void executeCall(final Subscriber<? super T> subscriber) {
         try {
             Request request = new Request.Builder()
                     .url(String.format(URL_FORMAT, callConfiguration.server.serverUrl, callConfiguration.pack, callConfiguration.block))
@@ -60,19 +59,31 @@ class Engine<T> {
                     .post(createMultipartBody())
                     .build();
             Response response = callConfiguration.server.okHttpClient.newCall(request).execute();
+
+            // So it looks like the server doesn't sent well-formed JSON back if the block isn't found.
+            // In that case, synthesize a return value that clients can understand, rather than a
+            // strange "JSON Parse Exception"
+            if (response.code() == 404) {
+                Map<String, Object> error = new HashMap<>();
+                error.put("error", callConfiguration.pack+"."+callConfiguration.block+" not found.");
+                subscriber.onError(new FailedCallException(error));
+                return;
+            }
+
+            String bodyString = response.body().string();
             JsonParser parser = new JsonParser();
-            JsonObject rootObject = parser.parse(response.body().string()).getAsJsonObject();
+            JsonObject rootObject = parser.parse(bodyString).getAsJsonObject();
             JsonElement payloadElement = rootObject.get(PAYLOAD);
 
             if (response.code() != 200) {
-                sendErrorWithPayload(this.subscriber, callConfiguration.server.gson, payloadElement);
+                sendErrorWithPayload(subscriber, callConfiguration.server.gson, payloadElement);
             } else {
                 String outcome = rootObject.get(OUTCOME).getAsString();
                 if (ERROR_OUTCOME.equals(outcome)) {
-                    sendErrorWithPayload(this.subscriber, callConfiguration.server.gson, payloadElement);
+                    sendErrorWithPayload(subscriber, callConfiguration.server.gson, payloadElement);
                 } else {
-                    this.subscriber.onNext((T) callConfiguration.responseProcessor.process(callConfiguration.server.gson, payloadElement));
-                    this.subscriber.onCompleted();
+                    subscriber.onNext((T) callConfiguration.responseProcessor.process(callConfiguration.server.gson, payloadElement));
+                    subscriber.onCompleted();
                 }
             }
         } catch (Throwable e) {

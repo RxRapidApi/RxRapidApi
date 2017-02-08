@@ -3,7 +3,7 @@ package com.gatebuzz.rapidapi.rx.internal.model;
 import okhttp3.MultipartBody;
 
 public class DataParameter extends ParameterValue<String> {
-    public DataParameter(String name, String value) {
+    DataParameter(String name, String value) {
         super(name, value);
     }
 

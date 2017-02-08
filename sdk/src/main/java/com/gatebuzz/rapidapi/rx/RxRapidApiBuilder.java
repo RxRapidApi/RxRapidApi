@@ -1,7 +1,5 @@
 package com.gatebuzz.rapidapi.rx;
 
-import com.gatebuzz.rapidapi.rx.internal.CallHandlerFactory;
-import com.gatebuzz.rapidapi.rx.internal.RapidApiInvocationHandler;
 import com.gatebuzz.rapidapi.rx.internal.model.CallConfiguration;
 import com.gatebuzz.rapidapi.rx.internal.model.CallConfigurationFactory;
 import com.gatebuzz.rapidapi.rx.internal.model.Server;

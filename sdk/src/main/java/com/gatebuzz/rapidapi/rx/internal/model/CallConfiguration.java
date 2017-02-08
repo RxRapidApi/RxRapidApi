@@ -19,9 +19,10 @@ public class CallConfiguration {
     public final List<ParameterSpec> parameters;
     public final ResponseProcessor responseProcessor;
 
-    public CallConfiguration(Server server, String project, String key, String pack, String block, List<ParameterSpec> parameters,
-                      Map<String, String> classLevelDefaults, Map<String, String> methodLevelDefaults,
-                      List<ParameterSpec> defaultParameters, ResponseProcessor responseProcessor) {
+    public CallConfiguration(Server server, String project, String key, String pack, String block,
+                             List<ParameterSpec> parameters, Map<String, String> classLevelDefaults,
+                             Map<String, String> methodLevelDefaults, List<ParameterSpec> defaultParameters,
+                             ResponseProcessor responseProcessor) {
         this.server = server;
         this.project = project;
         this.key = key;
