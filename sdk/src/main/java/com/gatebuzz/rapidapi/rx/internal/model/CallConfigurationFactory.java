@@ -13,8 +13,6 @@ import java.util.Map;
 
 public class CallConfigurationFactory {
 
-    private static final String[] EMPTY = new String[0];
-
     public static CallConfiguration newInstance(
             Application classApplicationAnnotation, Application methodApplicationAnnotation,
             ApiPackage classApiPackageAnnotation, ApiPackage methodApiPackageAnnotation,
@@ -80,7 +78,7 @@ public class CallConfigurationFactory {
     }
 
     private static List<ParameterSpec> getParameters(DefaultParameters dp) {
-        String[] strings = dp != null ? dp.value() : EMPTY;
+        String[] strings = dp != null ? dp.value() : new String[0];
         List<ParameterSpec> list = new ArrayList<>();
         for (String s : strings) {
             list.add(new ParameterSpec(s));

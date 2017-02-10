@@ -1,8 +1,6 @@
 package com.gatebuzz.rapidapi.rx.internal.model;
 
 import com.gatebuzz.rapidapi.rx.internal.ResponseProcessor;
-import com.gatebuzz.rapidapi.rx.internal.model.ParameterSpec;
-import com.gatebuzz.rapidapi.rx.internal.model.Server;
 
 import java.util.List;
 import java.util.Map;

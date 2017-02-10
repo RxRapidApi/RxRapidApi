@@ -16,11 +16,11 @@ import java.util.Map;
  * @see com.gatebuzz.rapidapi.rx.utils.DrillDown
  */
 public class KeyValueMapProcessor implements ResponseProcessor {
-    private static final Type MAP_STRING_TO_OBJECT = new TypeToken<Map<String, Object>>() {
+    public static final Type MAP_STRING_TO_OBJECT = new TypeToken<Map<String, Object>>() {
     }.getType();
     private final String resultKey;
 
-    private KeyValueMapProcessor(String resultKey) {
+    public KeyValueMapProcessor(String resultKey) {
         this.resultKey = resultKey;
     }
 
@@ -30,13 +30,5 @@ public class KeyValueMapProcessor implements ResponseProcessor {
         Object value = gson.fromJson(payloadElement, MAP_STRING_TO_OBJECT);
         result.put(resultKey, value);
         return result;
-    }
-
-    public static KeyValueMapProcessor success() {
-        return new KeyValueMapProcessor("success");
-    }
-
-    public static KeyValueMapProcessor error() {
-        return new KeyValueMapProcessor("error");
     }
 }

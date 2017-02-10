@@ -3,7 +3,6 @@ package com.gatebuzz.rapidapi.rx.internal;
 import com.gatebuzz.rapidapi.rx.FailedCallException;
 import com.gatebuzz.rapidapi.rx.internal.model.CallConfiguration;
 import com.gatebuzz.rapidapi.rx.internal.model.ParameterValue;
-import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -26,7 +25,7 @@ class Engine<T> {
     private static final String PAYLOAD = "payload";
     private static final String ERROR_OUTCOME = "error";
     private static final RequestBody EMPTY = RequestBody.create(MediaType.parse("text/plain"), "");
-    private static final ResponseProcessor ERROR_PROCESSOR = KeyValueMapProcessor.error();
+    private static final ResponseProcessor ERROR_PROCESSOR = new KeyValueMapProcessor("error");
 
     private final CallConfiguration callConfiguration;
     private final List<ParameterValue> body;
@@ -65,7 +64,7 @@ class Engine<T> {
             // strange "JSON Parse Exception"
             if (response.code() == 404) {
                 Map<String, Object> error = new HashMap<>();
-                error.put("error", callConfiguration.pack+"."+callConfiguration.block+" not found.");
+                error.put("error", callConfiguration.pack + "." + callConfiguration.block + " not found.");
                 subscriber.onError(new FailedCallException(error));
                 return;
             }
@@ -76,11 +75,11 @@ class Engine<T> {
             JsonElement payloadElement = rootObject.get(PAYLOAD);
 
             if (response.code() != 200) {
-                sendErrorWithPayload(subscriber, callConfiguration.server.gson, payloadElement);
+                subscriber.onError(new FailedCallException(parseErrorPayload(payloadElement)));
             } else {
                 String outcome = rootObject.get(OUTCOME).getAsString();
                 if (ERROR_OUTCOME.equals(outcome)) {
-                    sendErrorWithPayload(subscriber, callConfiguration.server.gson, payloadElement);
+                    subscriber.onError(new FailedCallException(parseErrorPayload(payloadElement)));
                 } else {
                     subscriber.onNext((T) callConfiguration.responseProcessor.process(callConfiguration.server.gson, payloadElement));
                     subscriber.onCompleted();
@@ -92,8 +91,8 @@ class Engine<T> {
         }
     }
 
-    private void sendErrorWithPayload(Subscriber<? super T> subscriber, Gson gson, JsonElement payloadElement) {
-        subscriber.onError(new FailedCallException((Map<String, Object>) ERROR_PROCESSOR.process(gson, payloadElement)));
+    private Map<String, Object> parseErrorPayload(JsonElement payloadElement) {
+        return (Map<String, Object>) ERROR_PROCESSOR.process(callConfiguration.server.gson, payloadElement);
     }
 
     private RequestBody createMultipartBody() {

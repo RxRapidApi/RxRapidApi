@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 
 public class RapidApiInvocationHandler implements InvocationHandler {
-    private static final String UTF_8 = "UTF-8";
     private final Map<String, CallConfiguration> callConfigurationMap;
     private final EngineYard engineYard;
 
@@ -70,7 +69,7 @@ public class RapidApiInvocationHandler implements InvocationHandler {
             String value = String.valueOf(parameterValue);
             if (parameter.urlEncoded) {
                 try {
-                    value = URLEncoder.encode(value, UTF_8);
+                    value = URLEncoder.encode(value, "UTF-8");
                 } catch (UnsupportedEncodingException ignored) {
                 }
             }

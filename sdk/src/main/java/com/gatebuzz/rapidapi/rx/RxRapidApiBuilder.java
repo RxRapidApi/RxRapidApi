@@ -1,11 +1,10 @@
 package com.gatebuzz.rapidapi.rx;
 
+import com.gatebuzz.rapidapi.rx.internal.*;
 import com.gatebuzz.rapidapi.rx.internal.model.CallConfiguration;
 import com.gatebuzz.rapidapi.rx.internal.model.CallConfigurationFactory;
 import com.gatebuzz.rapidapi.rx.internal.model.Server;
-import com.gatebuzz.rapidapi.rx.internal.*;
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import okhttp3.OkHttpClient;
 
 import java.lang.reflect.Method;
@@ -16,11 +15,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.gatebuzz.rapidapi.rx.internal.KeyValueMapProcessor.MAP_STRING_TO_OBJECT;
+
 @SuppressWarnings({"WeakerAccess", "unchecked"})
 public class RxRapidApiBuilder {
-
-    public static final Type MAP_STRING_TO_OBJECT = new TypeToken<Map<String, Object>>() {
-    }.getType();
 
     private final CallHandlerFactory callHandlerFactory;
     private final Map<String, String> classLevelDefaults = new HashMap<>();
@@ -218,7 +216,7 @@ public class RxRapidApiBuilder {
             Type[] typeArguments = ((ParameterizedType) declaredReturnType).getActualTypeArguments();
             if (typeArguments != null && typeArguments.length > 0) {
                 if (MAP_STRING_TO_OBJECT.equals(typeArguments[0])) {
-                    return KeyValueMapProcessor.success();
+                    return new KeyValueMapProcessor("success");
                 } else {
                     return new CustomTypeResponseProcessor(typeArguments[0]);
                 }
