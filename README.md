@@ -1,9 +1,9 @@
 # RxRapidApi
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg?style=plastic)](https://opensource.org/licenses/Apache-2.0) 
 ![Version](https://img.shields.io/badge/version-0.7.5-blue.svg?style=plastic)
-[![Stories in Ready](https://badge.waffle.io/psh/RxRapidApi.png?label=ready&title=Ready)](https://waffle.io/psh/RxRapidApi)
+[![Stories in Ready](https://badge.waffle.io/RxRapidApi/RxRapidApi.png?label=ready&title=Ready)](https://waffle.io/RxRapidApi/RxRapidApi)
 
-[RxRapidApi](https://github.com/psh/RxRapidApi) is a [Rapid Api](https://www.rapidapi.com/) client sdk that provides a type-safe, [RxJava](https://github.com/ReactiveX/RxJava) powered interface to Rapid API services.
+[RxRapidApi](https://github.com/RxRapidApi/RxRapidApi) is a [Rapid Api](https://www.rapidapi.com/) client sdk that provides a type-safe, [RxJava](https://github.com/ReactiveX/RxJava) powered interface to Rapid API services.
 
 # Download
 
@@ -23,7 +23,7 @@ or maven
 
 # Documentation
 
-Documentation is available on the [wiki](https://github.com/psh/RxRapidApi/wiki).
+Documentation is available on the [wiki](https://github.com/RxRapidApi/RxRapidApi/wiki).
 
 # License
     Copyright 2016 Paul S Hawke
