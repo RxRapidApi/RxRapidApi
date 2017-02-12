@@ -8,10 +8,13 @@
 # Download
 
 RxRapidApi is available from *jcenter* - via Gradle 
+
 ```
 compile 'com.gatebuzz:rxrapidapi:1.0.0'
 ```
+
 or maven
+
 ```xml
 <dependency>
   <groupId>com.gatebuzz</groupId>
