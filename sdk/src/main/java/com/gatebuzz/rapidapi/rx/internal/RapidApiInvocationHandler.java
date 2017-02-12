@@ -59,7 +59,6 @@ public class RapidApiInvocationHandler implements InvocationHandler {
         return Single.class.equals(method.getReturnType()) ? engine.getSingle() : engine.getObservable();
     }
 
-    @SuppressWarnings("unchecked")
     private void putBody(List<ParameterValue> body, ParameterSpec parameter, Object parameterValue) {
         if (parameterValue instanceof InputStream) {
             body.add(ParameterValue.stream(parameter.name, (InputStream) parameterValue));
@@ -70,7 +69,9 @@ public class RapidApiInvocationHandler implements InvocationHandler {
             if (parameter.urlEncoded) {
                 try {
                     value = URLEncoder.encode(value, "UTF-8");
-                } catch (UnsupportedEncodingException ignored) {
+                } catch (UnsupportedEncodingException e) {
+                    // Should never happen (famous last words, I know!)
+                    e.printStackTrace();
                 }
             }
             body.add(ParameterValue.data(parameter.name, value));

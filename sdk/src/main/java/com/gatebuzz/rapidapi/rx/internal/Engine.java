@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 @SuppressWarnings("unchecked")
-class Engine<T> {
+class Engine {
     private static final String URL_FORMAT = "%1$s/%2$s/%3$s";
     private static final String USER_AGENT = "User-Agent";
     private static final String AUTHORIZATION = "Authorization";
@@ -35,12 +35,12 @@ class Engine<T> {
         this.body = body;
     }
 
-    Single<T> getSingle() {
-        return getObservable().toSingle();
+    <T> Single<T> getSingle() {
+        return ((Observable<T>) getObservable()).toSingle();
     }
 
     @SuppressWarnings({"Convert2Lambda", "Anonymous2MethodRef"})
-    Observable<T> getObservable() {
+    <T> Observable<T> getObservable() {
         return Observable.create(new Observable.OnSubscribe<T>() {
             @Override
             public void call(Subscriber<? super T> subscriber) {
@@ -49,7 +49,7 @@ class Engine<T> {
         });
     }
 
-    private void executeCall(final Subscriber<? super T> subscriber) {
+    private <T> void executeCall(final Subscriber<? super T> subscriber) {
         try {
             Request request = new Request.Builder()
                     .url(String.format(URL_FORMAT, callConfiguration.server.serverUrl, callConfiguration.pack, callConfiguration.block))
