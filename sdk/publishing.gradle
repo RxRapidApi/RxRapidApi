@@ -34,7 +34,7 @@ bintray {
         name = 'RxRapidApi'
         userOrg = 'rxrapidapi'
         licenses = ['Apache-2.0']
-        vcsUrl = 'https://github.com/psh/RxRapidApi.git'
+        vcsUrl = 'https://github.com/RxRapidApi/RxRapidApi.git'
         version {
             name = "${bintrayVersion}"
             desc = releaseDescription
