@@ -41,3 +41,5 @@ captures/
 
 # Random stuff
 *.bak
+*.prj
+*.pui
