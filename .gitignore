@@ -38,3 +38,8 @@ captures/
 
 # Keystore files
 *.jks
+
+# Random stuff
+*.bak
+*.prj
+*.pui

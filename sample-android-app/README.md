@@ -8,9 +8,10 @@ The app will build just fine, and all the code remains the same, it's just going
 if you dont have the various API keys in place.
 
 ## local.properties
-```
-nasa.api.key=...
-rapidapi.api.key=...
-rapidapi.project.name=...
-```
 
+```
+rapidapi.project.name=<your project name>
+rapidapi.api.key=<your project API key>
+nasa.api.key=<your NASA API key>
+zillow.api.key=<your Zillow API key>
+```

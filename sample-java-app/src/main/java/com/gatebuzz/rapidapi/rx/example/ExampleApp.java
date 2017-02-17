@@ -38,6 +38,7 @@ public class ExampleApp extends Application {
     @Override
     public void start(Stage primaryStage) {
         this.primaryStage = primaryStage;
+        // Application configured using annotations in the service interface.
         hackerNewsApi = RxRapidApiBuilder.from(HackerNewsApi.class);
 
         // Setup logging of requests + responses
@@ -47,6 +48,7 @@ public class ExampleApp extends Application {
                 .addInterceptor(logging)
                 .build();
 
+				// Application absent from the service interface, allowing it to be shared.
         slackApi = new RxRapidApiBuilder()
                 .application("RxRapidApi_Demo", "e21f74d4-1cb0-4476-92fd-a81fb29d6fa0")
                 .endpoint(SlackApi.class)

@@ -1,16 +1,20 @@
 # RxRapidApi
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg?style=plastic)](https://opensource.org/licenses/Apache-2.0) 
-![Version](https://img.shields.io/badge/version-0.7.5-blue.svg?style=plastic)
+![Version](https://img.shields.io/badge/version-1.0.0-blue.svg?style=plastic)
 [![Stories in Ready](https://badge.waffle.io/RxRapidApi/RxRapidApi.png?label=ready&title=Ready)](https://waffle.io/RxRapidApi/RxRapidApi)
 
 [RxRapidApi](https://github.com/RxRapidApi/RxRapidApi) is a [Rapid Api](https://www.rapidapi.com/) client sdk that provides a type-safe, [RxJava](https://github.com/ReactiveX/RxJava) powered interface to Rapid API services.
+
+# Documentation
+
+Documentation is available on the [wiki](https://github.com/RxRapidApi/RxRapidApi/wiki).
 
 # Download
 
 RxRapidApi is available from *jcenter* - via Gradle 
 
 ```
-compile 'com.gatebuzz:rxrapidapi:0.7.5'
+compile 'com.gatebuzz:rxrapidapi:1.0.0'
 ```
 
 or maven
@@ -19,16 +23,13 @@ or maven
 <dependency>
   <groupId>com.gatebuzz</groupId>
   <artifactId>rxrapidapi</artifactId>
-  <version>0.7.5</version>
+  <version>1.0.0</version>
   <type>pom</type>
 </dependency>
 ```
 
-# Documentation
-
-Documentation is available on the [wiki](https://github.com/RxRapidApi/RxRapidApi/wiki).
-
 # License
+
     Copyright 2016 Paul S Hawke
 
     Licensed under the Apache License, Version 2.0 (the "License");
