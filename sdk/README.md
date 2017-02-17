@@ -42,3 +42,5 @@ spotifyApi.searchAlbums("The Rolling Stones", "", "", "")
             }
         });
 ```
+
+More documentation is available on the [wiki](https://github.com/RxRapidApi/RxRapidApi/wiki).
