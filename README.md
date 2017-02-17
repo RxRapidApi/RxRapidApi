@@ -5,6 +5,10 @@
 
 [RxRapidApi](https://github.com/RxRapidApi/RxRapidApi) is a [Rapid Api](https://www.rapidapi.com/) client sdk that provides a type-safe, [RxJava](https://github.com/ReactiveX/RxJava) powered interface to Rapid API services.
 
+# Documentation
+
+Documentation is available on the [wiki](https://github.com/RxRapidApi/RxRapidApi/wiki).
+
 # Download
 
 RxRapidApi is available from *jcenter* - via Gradle 
@@ -24,11 +28,8 @@ or maven
 </dependency>
 ```
 
-# Documentation
-
-Documentation is available on the [wiki](https://github.com/RxRapidApi/RxRapidApi/wiki).
-
 # License
+
     Copyright 2016 Paul S Hawke
 
     Licensed under the Apache License, Version 2.0 (the "License");
