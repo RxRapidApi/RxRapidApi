@@ -69,9 +69,8 @@ class Engine {
                 return;
             }
 
-            String bodyString = response.body().string();
             JsonParser parser = new JsonParser();
-            JsonObject rootObject = parser.parse(bodyString).getAsJsonObject();
+            JsonObject rootObject = parser.parse(response.body().charStream()).getAsJsonObject();
             JsonElement payloadElement = rootObject.get(PAYLOAD);
 
             if (response.code() != 200) {
