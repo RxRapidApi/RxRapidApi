@@ -8,6 +8,8 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
+import java.io.FileWriter;
+import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
@@ -39,8 +41,7 @@ public class RxRapidApiCodeGenerator {
             System.out.println("You need to pass the URL for a metadata.json file to process.");
             return;
         }
-        RxRapidApiCodeGenerator codeGenerator = new RxRapidApiCodeGenerator(args[0]);
-        System.out.println(codeGenerator.generate());
+        new RxRapidApiCodeGenerator(args[0]).generate();
     }
 
     private final String metaDataUrl;
@@ -53,10 +54,15 @@ public class RxRapidApiCodeGenerator {
         this.gson = new Gson();
     }
 
-    private String generate() throws Exception {
+    private void generate() throws Exception {
         Response response = client.newCall(new Request.Builder().url(metaDataUrl).build()).execute();
         if (response.code() == 200) {
+            System.out.println("Metadata downloaded.");
             ServiceDefinition def = gson.fromJson(response.body().charStream(), ServiceDefinition.class);
+
+            String fileName = def.getPackageName() + ".java";
+            FileWriter fw = new FileWriter(fileName);
+            PrintWriter pw = new PrintWriter(fw);
 
             StringBuilder sb = new StringBuilder();
             appendImports(sb);
@@ -68,10 +74,14 @@ public class RxRapidApiCodeGenerator {
             appendMethods(def, sb, defaults);
             sb.append("}\n");
 
-            return sb.toString();
-        }
+            pw.print(sb.toString());
+            pw.flush();
+            pw.close();
 
-        throw new Exception("Call Failed.");
+            System.out.println(fileName + " created.");
+        } else {
+            System.out.println("Failed to load metdata.");
+        }
     }
 
     private void appendImports(StringBuilder sb) {
