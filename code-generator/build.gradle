@@ -1,5 +1,4 @@
 apply plugin: 'java'
-apply plugin: 'application'
 
 repositories {
     jcenter()
@@ -23,10 +22,12 @@ if (project.rootProject.file('local.properties').exists()) {
     properties.load(project.rootProject.file('local.properties').newDataInputStream())
 }
 
-mainClassName = 'com.gatebuzz.rapidapi.rx.example.ExampleApp'
-applicationDefaultJvmArgs = [
-        "-Dslack.api.key=${properties.get('slack.api.key')}"
-]
+task run (type: JavaExec, dependsOn: classes){
+    args("https://raw.githubusercontent.com/RapidSoftwareSolutions/Marketplace-Github-Package/master/metadata.json")
+    description = "Code Generation"
+    main = "com.gatebuzz.rapidapi.rx.generator.RxRapidApiCodeGenerator"
+    classpath = sourceSets.main.runtimeClasspath
+}
 
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
