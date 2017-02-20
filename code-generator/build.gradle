@@ -29,5 +29,13 @@ task run (type: JavaExec, dependsOn: classes){
     classpath = sourceSets.main.runtimeClasspath
 }
 
+task index (type: JavaExec, dependsOn: classes){
+    args("https://raw.githubusercontent.com/RapidSoftwareSolutions/Marketplace-Github-Package/master/metadata.json")
+    description = "Code Generation Index Builder"
+    main = "com.gatebuzz.rapidapi.rx.generator.Indexer"
+    systemProperty("github.access.token", properties.getProperty("github.access.token"))
+    classpath = sourceSets.main.runtimeClasspath
+}
+
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
