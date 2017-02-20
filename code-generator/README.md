@@ -28,3 +28,5 @@ Github.java created.
 
 BUILD SUCCESSFUL
 ```
+
+Finally, check out the file that was generated.
