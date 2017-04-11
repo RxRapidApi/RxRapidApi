@@ -3,7 +3,7 @@ package com.gatebuzz.rapidapi.rx.internal;
 import com.gatebuzz.rapidapi.rx.internal.model.CallConfiguration;
 import com.gatebuzz.rapidapi.rx.internal.model.ParameterSpec;
 import com.gatebuzz.rapidapi.rx.internal.model.ParameterValue;
-import rx.Single;
+import io.reactivex.Single;
 
 import java.io.File;
 import java.io.InputStream;

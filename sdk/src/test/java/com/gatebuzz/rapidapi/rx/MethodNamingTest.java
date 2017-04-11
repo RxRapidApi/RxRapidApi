@@ -1,7 +1,7 @@
 package com.gatebuzz.rapidapi.rx;
 
+import io.reactivex.Observable;
 import org.junit.Test;
-import rx.Observable;
 
 import java.util.Map;
 

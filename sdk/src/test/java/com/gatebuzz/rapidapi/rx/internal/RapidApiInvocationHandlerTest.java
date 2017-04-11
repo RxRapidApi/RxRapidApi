@@ -7,6 +7,7 @@ import com.gatebuzz.rapidapi.rx.internal.model.CallConfiguration;
 import com.gatebuzz.rapidapi.rx.internal.model.ParameterSpec;
 import com.gatebuzz.rapidapi.rx.internal.model.ParameterValue;
 import com.gatebuzz.rapidapi.rx.internal.model.Server;
+import io.reactivex.Observable;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -14,7 +15,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import rx.Observable;
 
 import java.util.Arrays;
 import java.util.HashMap;

@@ -1,6 +1,6 @@
 package com.gatebuzz.rapidapi.rx.utils;
 
-import rx.functions.Func1;
+import io.reactivex.functions.Function;
 
 import java.util.Map;
 
@@ -10,7 +10,7 @@ import java.util.Map;
  * @see com.gatebuzz.rapidapi.rx.internal.KeyValueMapProcessor
  * @see com.gatebuzz.rapidapi.rx.utils.SuccessMapper
  */
-public class DrillDown implements Func1<Map<String, Object>, Map<String, Object>> {
+public class DrillDown implements Function<Map<String, Object>, Map<String, Object>> {
     private final String key;
 
     public DrillDown(String key) {
@@ -19,7 +19,7 @@ public class DrillDown implements Func1<Map<String, Object>, Map<String, Object>
 
     @Override
     @SuppressWarnings("unchecked")
-    public Map<String, Object> call(Map<String, Object> stringObjectMap) {
+    public Map<String, Object> apply(Map<String, Object> stringObjectMap) throws Exception {
         return (Map<String, Object>) stringObjectMap.get(key);
     }
 }

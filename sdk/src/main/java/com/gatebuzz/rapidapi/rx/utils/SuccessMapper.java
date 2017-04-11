@@ -1,6 +1,6 @@
 package com.gatebuzz.rapidapi.rx.utils;
 
-import rx.functions.Func1;
+import io.reactivex.functions.Function;
 
 import java.util.Map;
 
@@ -11,10 +11,10 @@ import java.util.Map;
  * @see com.gatebuzz.rapidapi.rx.internal.KeyValueMapProcessor
  * @see com.gatebuzz.rapidapi.rx.utils.DrillDown
  */
-public class SuccessMapper<T> implements Func1<Map<String, Object>, T> {
+public class SuccessMapper<T> implements Function<Map<String, Object>, T> {
     @Override
     @SuppressWarnings("unchecked")
-    public T call(Map<String, Object> serviceResult) {
+    public T apply(Map<String, Object> serviceResult) throws Exception {
         return (T) serviceResult.get("success");
     }
 }

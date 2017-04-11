@@ -5,6 +5,9 @@ import com.gatebuzz.rapidapi.rx.internal.model.CallConfiguration;
 import com.gatebuzz.rapidapi.rx.internal.model.ParameterSpec;
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
+import io.reactivex.Observable;
+import io.reactivex.Single;
+import io.reactivex.functions.Consumer;
 import okhttp3.OkHttpClient;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -13,9 +16,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import rx.Observable;
-import rx.Single;
-import rx.Subscriber;
 
 import java.util.*;
 
@@ -483,7 +483,7 @@ public class RxRapidApiBuilderTest {
                         assertNotNull(wrapper.albums.items);
                         assertFalse(wrapper.albums.items.isEmpty());
                     })
-                    .flatMap(wrapper -> Observable.from(wrapper.albums.items))
+                    .flatMap(wrapper -> Observable.fromIterable(wrapper.albums.items))
                     .doOnNext(album -> {
                         assertNotNull(album.id);
                         assertNotNull(album.name);
@@ -505,39 +505,25 @@ public class RxRapidApiBuilderTest {
                     .build();
 
             api.searchAlbumsAsMap("laura bono")
-                    .subscribe(new Subscriber<Map<String, Object>>() {
-                        @Override
-                        public void onCompleted() {
+                    .subscribe(result -> {
+                        assertNotNull(result);
+                        assertNotNull(result.get("success"));
 
-                        }
+                        Map<String, Object> success = (Map<String, Object>) result.get("success");
+                        Map<String, Object> albums = (Map<String, Object>) success.get("albums");
+                        assertNotNull(albums);
+                        assertNotNull(albums.get("href"));
+                        assertNotNull(albums.get("limit"));
+                        assertNotNull(albums.get("items"));
 
-                        @Override
-                        public void onError(Throwable e) {
-                            e.printStackTrace();
-                            fail("No exception expected");
-                        }
+                        List<Map<String, Object>> items = (List<Map<String, Object>>) albums.get("items");
+                        assertNotNull(items);
+                        assertFalse(items.isEmpty());
 
-                        @Override
-                        public void onNext(Map<String, Object> result) {
-                            assertNotNull(result);
-                            assertNotNull(result.get("success"));
-
-                            Map<String, Object> success = (Map<String, Object>) result.get("success");
-                            Map<String, Object> albums = (Map<String, Object>) success.get("albums");
-                            assertNotNull(albums);
-                            assertNotNull(albums.get("href"));
-                            assertNotNull(albums.get("limit"));
-                            assertNotNull(albums.get("items"));
-
-                            List<Map<String, Object>> items = (List<Map<String, Object>>) albums.get("items");
-                            assertNotNull(items);
-                            assertFalse(items.isEmpty());
-
-                            for (Map<String, Object> item : items) {
-                                assertNotNull(item.get("id"));
-                                assertNotNull(item.get("name"));
-                                assertNotNull(item.get("available_markets"));
-                            }
+                        for (Map<String, Object> item : items) {
+                            assertNotNull(item.get("id"));
+                            assertNotNull(item.get("name"));
+                            assertNotNull(item.get("available_markets"));
                         }
                     });
         } catch (Exception e) {

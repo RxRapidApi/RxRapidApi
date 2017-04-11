@@ -6,10 +6,8 @@ import com.gatebuzz.rapidapi.rx.internal.model.ParameterValue;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import io.reactivex.*;
 import okhttp3.*;
-import rx.Observable;
-import rx.Single;
-import rx.Subscriber;
 
 import java.util.HashMap;
 import java.util.List;
@@ -35,21 +33,46 @@ class Engine {
         this.body = body;
     }
 
-    <T> Single<T> getSingle() {
-        return ((Observable<T>) getObservable()).toSingle();
-    }
-
     @SuppressWarnings({"Convert2Lambda", "Anonymous2MethodRef"})
-    <T> Observable<T> getObservable() {
-        return Observable.create(new Observable.OnSubscribe<T>() {
+    <T> Single<T> getSingle() {
+        return Single.create(new SingleOnSubscribe<T>() {
             @Override
-            public void call(Subscriber<? super T> subscriber) {
-                executeCall(subscriber);
+            public void subscribe(SingleEmitter<T> singleEmitter) throws Exception {
+                executeCall(singleEmitter);
             }
         });
     }
 
-    private <T> void executeCall(final Subscriber<? super T> subscriber) {
+    @SuppressWarnings({"Convert2Lambda", "Anonymous2MethodRef"})
+    <T> Observable<T> getObservable() {
+        return Observable.create(new ObservableOnSubscribe<T>() {
+            @Override
+            public void subscribe(ObservableEmitter<T> observableEmitter) throws Exception {
+                executeCall(observableEmitter);
+            }
+        });
+    }
+
+    private <T> void executeCall(SingleEmitter<T> singleEmitter) {
+        executeCall(new Emitter<T>() {
+            @Override
+            public void onNext(T t) {
+                singleEmitter.onSuccess(t);
+            }
+
+            @Override
+            public void onError(Throwable throwable) {
+                singleEmitter.onError(throwable);
+            }
+
+            @Override
+            public void onComplete() {
+                // deliberate no-op
+            }
+        });
+    }
+
+    private <T> void executeCall(final Emitter<T> subscriber) {
         try {
             Request request = new Request.Builder()
                     .url(String.format(URL_FORMAT, callConfiguration.server.serverUrl, callConfiguration.pack, callConfiguration.block))
@@ -81,7 +104,7 @@ class Engine {
                     subscriber.onError(new FailedCallException(parseErrorPayload(payloadElement)));
                 } else {
                     subscriber.onNext((T) callConfiguration.responseProcessor.process(callConfiguration.server.gson, payloadElement));
-                    subscriber.onCompleted();
+                    subscriber.onComplete();
                 }
             }
         } catch (Throwable e) {

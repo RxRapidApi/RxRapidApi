@@ -43,3 +43,5 @@ captures/
 *.bak
 *.prj
 *.pui
+
+.DS_Store
