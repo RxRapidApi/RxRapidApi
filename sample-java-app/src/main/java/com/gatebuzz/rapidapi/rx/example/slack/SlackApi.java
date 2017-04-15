@@ -4,12 +4,13 @@ import com.gatebuzz.rapidapi.rx.ApiPackage;
 import com.gatebuzz.rapidapi.rx.DefaultParameters;
 import com.gatebuzz.rapidapi.rx.Named;
 import com.gatebuzz.rapidapi.rx.Required;
-import rx.Observable;
+import io.reactivex.Observable;
 
 import java.io.File;
 import java.io.InputStream;
 import java.util.Map;
 
+@SuppressWarnings({"unused", "SameParameterValue"})
 @ApiPackage("Slack")
 @DefaultParameters("token")
 public interface SlackApi {

@@ -12,7 +12,12 @@ import com.gatebuzz.rapidapi.rx.example.hackernews.HackerNewsApi;
 import com.gatebuzz.rapidapi.rx.example.hackernews.Story;
 import com.gatebuzz.rapidapi.rx.example.slack.SlackApi;
 import com.gatebuzz.rapidapi.rx.example.slack.SlackFileResponse;
-import com.google.gson.Gson;
+import io.reactivex.Observable;
+import io.reactivex.ObservableSource;
+import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
+import io.reactivex.rxjavafx.schedulers.JavaFxScheduler;
+import io.reactivex.schedulers.Schedulers;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -22,15 +27,10 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
-import rx.Observable;
-import rx.functions.Func1;
-import rx.schedulers.JavaFxScheduler;
-import rx.schedulers.Schedulers;
 
 @SuppressWarnings("unchecked")
 public class ExampleApp extends Application {
 
-    private final Gson gson = new Gson();
     private HackerNewsApi hackerNewsApi;
     private SlackApi slackApi;
     private Stage primaryStage;
@@ -82,13 +82,13 @@ public class ExampleApp extends Application {
 
         hackerNewsApi.getNewStories()
                 .subscribeOn(Schedulers.newThread())
-                .flatMap(map -> Observable.from((List<Double>) map.get("success")))
+                .flatMap(Observable::fromIterable)
                 .take(5)
                 .map(Double::longValue)
                 .flatMap(id -> hackerNewsApi.getItem(id))
                 .map(r -> new Story((Map<String, Object>) r.get("success")))
-                .observeOn(JavaFxScheduler.getInstance())
-                .subscribe(System.out::println);
+                .observeOn(JavaFxScheduler.platform())
+                .subscribe(story -> System.out.println("story = " + story));
     }
 
     private void tryTheSlackApi() {

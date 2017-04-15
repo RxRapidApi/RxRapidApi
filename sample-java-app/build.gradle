@@ -15,7 +15,7 @@ dependencies {
     compile 'com.squareup.okhttp3:okhttp:3.5.0'
     compile 'com.google.code.gson:gson:2.8.0'
     compile 'com.squareup.okhttp3:logging-interceptor:3.5.0'
-    compile 'io.reactivex:rxjavafx:0.3.0'
+    compile 'io.reactivex:rxjavafx:2.0.2'
 }
 
 Properties properties = new Properties()

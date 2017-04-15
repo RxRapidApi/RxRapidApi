@@ -3,15 +3,16 @@ package com.gatebuzz.rapidapi.rx.example.hackernews;
 import com.gatebuzz.rapidapi.rx.ApiPackage;
 import com.gatebuzz.rapidapi.rx.Application;
 import com.gatebuzz.rapidapi.rx.Named;
+import io.reactivex.Observable;
 
+import java.util.List;
 import java.util.Map;
 
-import rx.Observable;
-
+@SuppressWarnings("unused")
 @Application(project = "RxRapidApi_Demo", key = "e21f74d4-1cb0-4476-92fd-a81fb29d6fa0")
 @ApiPackage("HackerNews")
 public interface HackerNewsApi {
-    Observable<Map<String, Object>> getNewStories();
+    Observable<List<Double>> getNewStories();
 
     Observable<Map<String, Object>> getBestStories();
 
